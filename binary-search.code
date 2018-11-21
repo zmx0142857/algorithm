@@ -1,0 +1,15 @@
+# returns true iff val in L
+binary_search(L, val):
+	if L.empty():
+		return false
+	lo = 0
+	hi = L.length-1
+	while lo < hi:
+		mid = (lo+hi) // 2
+		if L[mid] < val:
+			lo = mid+1
+		elif L[mid] > val:
+			hi = mid-1
+		else:
+			return true
+	return L[lo] == val

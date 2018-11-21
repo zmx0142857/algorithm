@@ -1,0 +1,44 @@
+zmx:~/git/data-structure$ ./sort
+usage: sort <option> <numbers>
+-b   bubble sort
+-h   heap sort
+-i   insertion sort
+-m   merge sort
+-q   quick sort
+-s   select sort
+-S   Shell sort
+zmx:~/git/data-structure$ time ./sort -b in > out
+
+real	1m11.844s
+user	1m11.841s
+sys	0m0.004s
+zmx:~/git/data-structure$ time ./sort -s in > out
+
+real	0m27.209s
+user	0m27.193s
+sys	0m0.016s
+zmx:~/git/data-structure$ time ./sort -i in > out
+
+real	0m14.652s
+user	0m14.643s
+sys	0m0.008s
+zmx:~/git/data-structure$ time ./sort -S in > out
+
+real	0m0.093s
+user	0m0.093s
+sys	0m0.000s
+zmx:~/git/data-structure$ time ./sort -h in > out
+
+real	0m0.076s
+user	0m0.072s
+sys	0m0.004s
+zmx:~/git/data-structure$ time ./sort -q in > out
+
+real	0m0.067s
+user	0m0.067s
+sys	0m0.000s
+zmx:~/git/data-structure$ time ./sort -m in > out
+
+real	0m0.065s
+user	0m0.061s
+sys	0m0.004s

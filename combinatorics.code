@@ -1,0 +1,21 @@
+# output permutations of [beg...end-1]
+# result is the array being permutated
+permutation(result, beg, end):
+	if beg < end:
+		for i = beg ... end-1:
+			result.swap(i, beg)
+			permutation(result, beg+1, end)
+			result.swap(i, beg)
+	else:
+		print result
+
+# output combinations of [beg...end-1] choose m
+# result is the temporary array used to output
+# j is a writer pointer
+combination(result, beg, end, m, j):
+	if m > 0:
+		for i = beg ... end-m:
+			*j = *i
+			combination(result, i+1, end, m-1, j+1)
+	else:
+		print result
