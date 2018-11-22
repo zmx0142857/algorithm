@@ -64,5 +64,6 @@ void test_combination()
 
 int main()
 {
+	test_combination();
 	return 0;
 }
