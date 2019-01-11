@@ -1,0 +1,253 @@
+### forward list
+#                           empty list
+# [0]->[1]->[2]->[3]->NULL
+#  ^                        NULL
+#  head                     ^
+#                           head      
+
+class ForwardListNode:
+	val
+	next
+
+class ForwardList:
+
+	head = NULL
+
+	construct(arr, size):
+		while size > 0:
+			push_front(arr[--size])
+	
+	destruct():
+		while !empty():
+			pop_front()
+	
+	empty():
+		return head == NULL
+
+	# find ith node of list, i counts from 0
+	# return NULL if i is invalid
+	# return head if i == 0
+	get(i):
+		if i < 0:
+			return NULL
+		p = head
+		while p and i--:
+			p = p->next
+		return p
+	
+	insert_after(p, val):
+		if !p:
+			return
+		p->next =								# 2. move pointer
+			new ForwardListNode(val, p->next)	# 1. create
+
+	erase_after(p):
+		if !p or !p->next:
+			return
+		tmp = p->next
+		p->next = tmp->next						# 1. move pointer
+		delete tmp								# 2. delete
+
+	# insert_after() and erase_after() cannot deal with head node,
+	# so push_front() and pop_front() are necessary
+	
+	push_front(val):
+		head = new ForwardListNode(val, head)
+
+	pop_front():
+		if empty():
+			return
+		tmp = head
+		head = head->next
+		delete tmp
+	
+	to_str():
+		buffer = '['
+		p = head
+		if p:
+			buffer += str(p->val)
+			p = p->next;
+		while p:
+			buffer += ', ' + str(p->val)
+			p = p->next;
+		return buffer + ']'
+
+### circular list
+#                  singular list  empty list
+#  head                                     
+#  v                head          head
+# [0]->[1]->[2]     v             v
+#  ^         |     [0]-.          NULL      
+#  |         v      ^   )
+# [5]<-[4]<-[3]     `--'        
+#
+# each node has its next as long as the list is not empty.
+
+class CirListNode:
+	val
+	next
+
+class CirList:
+
+	head = NULL
+
+	construct(arr, size):
+		if size > 0:
+			insert_after(head, arr[0])
+			while size > 1:
+				insert_after(head, arr[--size])
+	
+	destruct():
+		while !empty():
+			erase_after(head)
+	
+	empty():
+		return head == NULL
+
+	singular():
+		return !empty() and head->next == head
+
+	# find ith node of list, i counts from 0
+	# return NULL if i is invalid
+	# return head if i == 0
+	# return the element indexed (i % len) if i >= list.length
+	get(i):
+		return next(head, i)
+
+	# next ith node of p
+	# return NULL if i is invalid
+	# return p if i == 0
+	next(p, i):
+		if i < 0 or empty():
+			return NULL
+		while i--:
+			p = p->next
+		return p
+	
+	# this method has to deal with empty list
+	insert_after(p, val):
+		if p:
+			p->next =							# 2. move pointer
+				new CirListNode(val, p->next)	# 1. create
+		elif empty():
+			head = new CirListNode(val, NULL)
+			head->next = head
+
+	# this method has to deal with singular list
+	erase_after(p):
+		if !p:
+			return
+		tmp = p->next
+		p->next = tmp->next						# 1. move pointer
+		delete tmp								# 2. delete
+		if tmp == head:
+			if singular():
+				head = NULL
+			else:
+				head = p->next
+
+	to_str():
+		buffer = '['
+		p = head
+		if p:
+			buffer += str(p->val)
+			p = p->next;
+		while p != head:
+			buffer += ', ' + str(p->val)
+			p = p->next;
+		return buffer + ']'
+
+### dual list with dummy tail node
+#                                              empty list
+# NULL<-[0]<=>[1]<=>[2]<=>[3]<=>[tail]->NULL
+#        ^                                     NULL<-[tail]->NULL
+#        head                                         ^
+#                                                     head
+
+class DualListNode:
+	val
+	next
+	prev
+
+class DualList:
+
+	head = tail = new DualListNode(does_not_matter, NULL, NULL)
+
+	construct(arr, size):
+		while size > 0:
+			push_front(arr[--size])
+	
+	destruct():
+		while !empty():
+			pop_front()
+
+	empty():
+		return head == tail
+
+	# find ith node of list, i counts from 0
+	# return tail if i is invalid
+	# return head if i == 0
+	get(i):
+		if i < 0:
+			return tail
+		p = head
+		while p != tail and i--:
+			p = p->next
+		return p
+	
+	# insert a node before p, p can be dummy tail node
+	insert(p, val):
+		if !p:
+			return
+		elif p == head:
+			push_front(val)
+		else:
+			node = new DualListNode(val, p, p->prev)	# 1. create
+			p->prev->next = node						# 2. move pointer
+			p->prev = node
+
+
+	# delete the node p
+	erase(p):
+		if !p or p == tail:
+			return
+		elif p == head:
+			return pop_front()
+		else:
+			p->prev->next = p->next					# 1. move pointer
+			p->next->prev = p->prev
+			delete p								# 2. delete
+
+	push_front(val):
+		head->prev = new DualListNode(val, head, NULL)
+		head = head->prev
+
+	pop_front():
+		if empty():
+			return
+		head = head->next
+		delete head->prev
+		head->prev = NULL
+
+	to_str():
+		buffer = '['
+		p = head
+		if p != tail:
+			buffer += str(p->val)
+			p = p->next;
+		while p != tail:
+			buffer += ', ' + str(p->val)
+			p = p->next;
+		return buffer + ']'
+
+# forward list implemented by array
+#
+#   val  [ /, A, C, B, E, D]
+#   next [ 1, 3, 2, 5, 4, 0]
+#
+# represents:
+#   A -> B -> C -> D -> E -> NULL
+
+class ForwardListArr:
+	val[]
+	next[]

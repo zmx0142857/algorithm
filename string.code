@@ -1,0 +1,28 @@
+# suppose m > 0
+compute_prefix_function(p):
+	m = p.length
+	pi = new array[m]
+	pi[0] = -1
+	k = -1
+	for q = 1..m-1:
+		while k != -1 and p[k+1] != p[q]:
+			k = pi[k]
+		if p[k+1] == p[q]:
+			++k
+		pi[q] = k
+	return pi
+
+# O(m + n)
+kmp_matcher(text, pattern):
+	n = text.length
+	m = pattern.length
+	pi = compute_prefix_function(pattern)
+	q = -1
+	for i = 0..n-1:
+		while q != -1 and pattern[q+1] != text[i]:
+			q = pi[q]
+		if pattern[q+1] == text[i]:
+			++q
+		if q == m:
+			print("pattern occurs in ", i-m+1)
+			q = pi[q]

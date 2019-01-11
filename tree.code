@@ -1,0 +1,372 @@
+# left-child, right-sibling structure
+class TreeNode:
+	val
+	child = NULL	# left most child
+	sibling = NULL	# next sibling
+
+	is_leaf():
+		return !child
+
+	insert_as_child(node):
+		if child:
+			node->sibling = child
+		child = node
+
+# actually, forest
+class Tree:
+
+	root = NULL
+	display = VERBOSE
+
+	# build tree from the binary tree equivalant preorder sequence
+	# size is guaranteed to be > 0, because null tree is [null_value]
+	# null_value is a user-specified value for null node
+	construct(arr, size, null_value):
+		i = 0
+		do_construct(arr, size, i, root, null_value)
+
+	# i is reference to int, p is reference to pointer
+	do_construct(arr, size, &i, *&p, null_value):
+		if arr[i++] != null_value:
+			p = new TreeNode(arr[i-1])
+			if i == size:
+				return
+			construct(arr, size, i, p->child, null_value);
+			construct(arr, size, i, p->sibling, null_value);
+
+	copy(*&dest, src):
+		if src:
+			dest = new TreeNode(src->val, src->child, src->sibling)
+			copy(dest->child, src->child)
+			copy(dest->sibling, src->sibling)
+
+	destruct():
+		clear(root)
+
+	# delete node and all its siblings and children
+	# use postorder!
+	clear(node):
+		if node:
+			destruct(node->child)
+			destruct(node->sibling)
+			delete node
+
+	# interesting and illustrative output
+	# nodes is a vector of pointers, starts with the root node in it
+	# it is guaranteed not to be empty
+	verbose():
+		while nodes.back():
+			print('\n')
+			# output none for first level
+			# output "| " if an ancester has sibling
+			# output "|-" if this node has sibling
+			# output "'-" if this node has no sibling
+			for elem in nodes[1 ... nodes.size()-2]:
+				print(elem->sibling ? "| " : "  ")
+			print(nodes.back()->sibling ? "|-" : "'-")
+			print(nodes.back()->val)
+		
+			# descend into next level
+			nodes.push_back(nodes.back()->child)
+			verbose()
+			nodes.pop_back()
+
+			nodes.back() = nodes.back()->sibling
+
+	preorder(node, visit):
+		while node:
+			visit(node)
+			preorder(node->child)
+			node = node->sibling
+
+	postorder(node, visit):
+		while node:
+			postorder(node->child)
+			visit(node)
+			node = node->sibling
+
+	levelorder(node, visit):
+		while true:
+			while node:
+				enqueue(node)
+				node = node->sibling
+			if !queue:
+				break
+			node = dequeue()
+			visit(node)
+			node = node->child
+
+	preorder_nonrec(node, visit):
+		push(NULL)
+		while node:
+			visit(node)
+			if node->sibling:
+				push(node->sibling)
+			if node->child:
+				node = node->child
+			else:
+				node = pop()
+
+	postorder_nonrec(node, visit):
+		while s or node:
+			if node:
+				push(node)
+				node = node->child
+			else:
+				node = pop()
+				visit(node)
+				node = node->sibling
+	
+	# using levelorder
+	# return NULL if cannot find parent
+	parent(node):
+		if !node:
+			return NULL
+		p = root
+		ret = NULL		# saves parent
+		while true:
+			while p:
+				if p == node:
+					return ret
+				enqueue(p)
+				p = p->sibling
+			if !queue:
+				break
+			p = dequeue()
+			ret = p			# saves parent
+			p = p->child	# descend into next level
+
+		return NULL
+
+	# using levelorder
+	# return NULL if cannot find elder sibling
+	elder_sibling(node):
+		if !node:
+			return NULL
+		p = root
+		while true:
+			if p == node:	# first child has no elder sibling
+				return NULL
+			while p:
+				if p->sibling == node:
+					return p
+				enqueue(p)
+				p = p->sibling
+			if !queue:
+				break
+			p = dequeue()
+			p = p->child
+
+		return NULL
+
+	count_child(node):
+		if !node or !node->child:
+			return 0
+		p = node->child
+		ret = 1
+		while p->sibling
+			++ret
+			p = p->sibling
+		return ret
+
+	remove_subtree(node):
+		if !node:					# do nothing
+			return
+		if node == root:			# if node is root
+			root = root->sibling
+		else:
+			p = parent(node)
+			if p->child == node:	# if node is first child of p
+				p->child = node->sibling
+			else:
+				p = p->child
+				while p->sibling != node:
+					p = p->sibling
+				p->sibling = node->sibling
+		node->sibling = NULL		# node has no sibling now
+		clear(node)					# it is safe to remove it
+
+# has a pointer points to parent
+class UnionSetNode:
+	val
+	parent
+
+	root():
+		p = this
+		while p->parent:
+			p = p->parent
+		return p
+
+	# find root as well as compression
+	#	1 -> 2 -> 3 -> 4
+	# turns into
+	#	1 -> 4 <- 3
+	#	     ^
+	#	     2
+	root_compression_nonrec():
+		p = this
+		while p->parent:
+			stack.push(p)
+			p = p->parent
+		# now p is root
+		while stack:
+			top = stack.pop()
+			top.parent = p
+		return p
+
+	static root_compression(node):
+		if !node->parent:
+			return node
+		node->parent = root_compression(node->parent)
+		return node->parent
+
+	static equal(p, q):
+		return p.root() == q.root()
+
+class UnionSet:
+	root
+	size
+
+	# update root->size only;
+	# once a node stops being root, it will never be root again
+	static union(s1, s2):
+		if s1.root != s2.root:
+			if s1.size >= s2.size:
+				s2.root->parent = s1.root
+				s1.size += s2.size
+			else:
+				s1.root->parent = s2.root
+				s2.size += s1.size
+
+# the following types are used for compression storage
+# we will use the same example:
+#      A       G
+#    / | \    / \
+#   B  C  D  H   I
+#     / \    |
+#    E   F   J
+
+class ZipTreeNode
+	val
+	has_child
+	has_sibling
+
+class DegreeZipTreeNode:
+	val
+	degree	# number of children
+
+# preorder ziptree
+#
+#   val				A B C E F D G H J I
+#   has_child		1 0 1 0 0 0 1 1 0 0
+#   has_sibling		1 1 1 1 0 0 0 1 0 0
+
+unzip_preorder(ziptree_arr):
+	p = &root # p is pointer to pointer
+	push(NULL)
+	for elem in ziptree_arr:
+		*p = new TreeNode(elem.val)
+		if elem.has_sibling:
+			push(&((*p)->sibling))
+		if elem.has_child:
+			p = &((*p)->child)
+		else:
+			p = pop()
+	
+# postorder ziptree, unfortunately, is useless because there is more than
+# one possible tree for this example:
+#
+#	val				A B C
+#	has_child		0 0 1
+#	has_sibling		1 0 0
+#
+#	  C      A  C
+#	 / \       /
+#	A   B     B
+
+# levelorder ziptree
+#
+#   val				A G B C D H I E F J
+#   has_child		1 1 0 1 0 1 0 0 0 0
+#   has_sibling		1 0 1 1 0 1 0 1 0 0
+
+unzip_levelorder(ziptree_arr):
+	p = &root
+	for elem in ziptree_arr:
+		*p = new TreeNode(elem.val)
+		if elem.has_child
+			enqueue(&((*p)->child))
+		if elem.has_sibling:
+			p = &((*p)->sibling)
+		else:
+			p = dequeue()
+
+# preorder degree ziptree
+#
+#   val				A B C E F D G H J I
+#   degree			3 0 2 0 0 0 2 1 0 0
+
+unzip_degree_preorder(ziptree_arr):
+	if size == 0:
+		return
+	root = new TreeNode(ziptree_arr[0].val)
+	s.push(root)
+	s_deg.push(ziptree_arr[0].degree)
+	for elem in ziptree_arr[1 ... ]:
+		p = new TreeNode(elem.val)
+		if s_deg.top() == 0:
+			while s and s_deg.top() == 0:
+				q = s.pop()
+				s.deg_pop()
+			q->sibling = p
+		else:
+			s.top()->child = p
+		if s:
+			--s_deg.top()
+		s.push(p)
+		s_deg.push(elem.degree)
+
+# postorder degree ziptree
+#
+#   val				B E F C D A J H I G
+#   degree			0 0 0 2 0 3 0 1 0 2
+
+unzip_degree_postorder(ziptree_arr):
+	for elem in ziptree_arr:
+		root = new TreeNode(elem.val)
+		p = NULL
+		deg = elem.degree
+		while deg--:
+			top()->sibling = p
+			p = pop()
+		root->child = p
+		push(root)
+	root = NULL
+	while stack:
+		top()->sibling = root
+		root = pop()
+
+# levelorder degree ziptree
+#
+#   val				A G B C D H I E F J
+#   degree			3 2 0 2 0 1 0 0 0 0
+
+unzip_degree_levelorder(ziptree_arr):
+	for elem in ziptree_arr:
+		p = new TreeNode(elem.val)
+		s.push(p)
+		if elem.degree > 0:
+			s_has_child.push(p)
+			s_deg.push(elem.degree)
+	# now connect the nodes - it's just like a puzzle game
+	while s_has_child:
+		s_has_child.top()->insert_as_child(s.pop())
+		--s_deg.top()
+		if s_deg.top() == 0:
+			s_has_child.pop()
+			s_deg.pop()
+	root = NULL
+	while s:
+		s.top()->sibling = root
+		root = s.pop()
+

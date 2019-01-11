@@ -1,0 +1,181 @@
+# stack by array
+#
+# [0, 1, 2, 3][ ]
+#              ^
+#              top
+
+class ArrStack:
+	
+	capacity = n
+	top = 0
+	stack = new array[capacity]
+
+	construct(arr, size):
+		capacity = size
+		top = size
+		stack = new array[capacity]
+		for i = 0..size-1:
+			stack[i] = arr[i]
+
+	destruct():
+		delete[] stack
+	
+	clear():
+		top = 0
+	
+	push(val):
+		if top == capacity:
+			error("push: stack overflow")
+		stack[top++] = val
+	
+	pop():
+		if top == 0:
+			error("pop: stack underflow")
+		return stack[--top]
+
+	get():
+		if top == 0:
+			error("get: stack is empty")
+		return stack[top-1]
+
+	size():
+		return top
+
+# stack by link (without dummy node)
+#
+# [0]->[1]->[2]->NULL
+#  ^
+#  top
+
+class LinkStack:
+
+	top = NULL
+	size = 0
+
+	destruct():
+		clear()
+	
+	clear():
+		while top:
+			tmp = top
+			top = top->next
+			delete tmp
+		size = 0
+	
+	push(val):
+		node = new Node(val, top)
+		top = node
+		++size
+
+	pop():
+		if size == 0:
+			error("pop: stack underflow")
+		tmp = top
+		ret = top->val
+		top = top->next
+		delete tmp
+		--size
+		return ret
+	
+	get():
+		if size == 0:
+			error("get: stack is empty")
+		return top->val
+	
+# queue by array
+#
+# [*, *, 0, 1, 2, 3, *, *]
+#        ^           ^
+#        front       rear
+
+class ArrQueue:
+
+	# an extra position is left for difference
+	# between empty and full queue
+	capacity = n + 1
+	front = 0
+	rear = 0
+	queue = new array[capacity]
+
+	construct(arr, size):
+		capacity = 2*size+1
+		front = 0
+		rear = size
+		queue = new array[capacity]
+		for i = 0..size-1:
+			queue[i] = arr[i]
+
+	destruct():
+		delete[] queue
+
+	clear():
+		rear = front
+
+	enqueue(val):
+		next = (rear+1) % capacity
+		if front == next:
+			error("enqueue: queue overflow")
+		queue[rear] = val
+		rear = next
+	
+	dequeue():
+		if front == rear:
+			error("dequeue: queue underflow")
+		tmp = front
+		front = (front+1) % capacity
+		return queue[tmp]
+
+	get():
+		if front == rear:
+			error("get: queue is empty")
+		return queue[front]
+
+# queue by link (without dummy node)
+#
+#   [0]->[1]->[2]->[3]->NULL
+#    ^              ^
+#    front          rear
+#
+#  empty queue:
+#
+#    front -> NULL <- rear
+
+class QueueLnk:
+
+	front = NULL
+	rear = NULL
+	size = 0
+
+	destruct():
+		clear()
+
+	clear():
+		while front:
+			tmp = front
+			front = front->next
+			delete tmp
+		rear = NULL
+		size = 0
+
+	enqueue(val):
+		if !front: # empty queue
+			front = rear = new Node(val, NULL)
+		else:
+			rear->next = new Node(val, NULL)
+			rear = rear->next
+		++size
+
+	dequeue():
+		if !front: # empty queue
+			error("dequeue: queue underflow")
+		tmp = front
+		front = front->next
+		delete tmp
+		--size
+		if !front:
+			rear = NULL
+		
+	get():
+		if !front:
+			error("get: queue is empty")
+		return front->val

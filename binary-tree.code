@@ -1,0 +1,265 @@
+# binary tree node
+
+class BinaryTreeNode:
+	val
+	left
+	right
+
+# binary tree by link
+
+class BinaryTree:
+
+	root = NULL
+
+	# construct from a value, left tree and right tree
+	# left, right are references
+	construct(val, left, right):
+		root = new BinaryTreeNode(val, left, right)
+		left.root = NULL
+		right.root = NULL
+
+	# construct from a extended preorder sequence
+	# size > 0 because null tree takes [null]
+	# null is not NULL, which means null pointer
+	construct(preorder_arr, size, null):
+		root = NULL
+		i = 0
+		do_construct(preorder_arr, size, i, root, null)
+
+	# i is reference to int
+	# p is reference to pointer
+	do_construct(preorder_arr, size, i, p, null):
+		if preorder_arr[i++] != null:
+			p = new BinaryTreeNode(preorder_arr[i-1], NULL, NULL)
+			if i == size:
+				return
+			do_construct(preorder_arr, size, i, p->left, null)
+			do_construct(preorder_arr, size, i, p->right, null)
+
+	destruct():
+		postorder(node, delete)
+
+	preorder(node, visit):
+		if node:
+			visit(node)
+			preorder(node->left)
+			preorder(node->right)
+
+	inorder(node, visit):
+		if node:
+			inorder(node->left)
+			visit(node)
+			inorder(node->right)
+
+	postorder(node, visit):
+		if node:
+			postorder(node->left)
+			postorder(node->right)
+			visit(node)
+	
+	levelorder(node, visit):
+		if node:
+			queue.enqueue(node)
+		while queue:
+			node = queue.dequeue()
+			visit(node)
+			if node->left:
+				queue.enqueue(node->left)
+			if node->right:
+				queue.enqueue(node->right)
+
+	preorder_nonrec(node, visit):
+		stack.push(NULL)
+		while node:
+			visit(node)
+			if node->right:
+				stack.push(node->right)
+			if node->left:
+				node = node->left
+			else:
+				node = stack.pop()
+
+	inorder_nonrec(node, visit):
+		while True:
+			if node:
+				stack.push(node)
+				node = node->left
+			elif stack:
+				node = stack.pop()
+				visit(node)
+				node = node->right
+			else:
+				break
+
+	postorder_nonrec(node, visit):
+		while True:
+			if node:
+				stack.push(node, 'L')
+				node = node->left
+			elif stack:
+				node, choice = stack.pop()
+				if choice == 'L':
+					stack.push(node, 'R')
+					node = node->right
+				else: # choice == 'R'
+					visit(node)
+					node = NULL
+			else:
+				break
+
+	# using inorder traverse
+	# return NULL if cannot find parent
+	parent(node):
+		if !node or node == root:
+			return NULL
+		while True:
+			if p:
+				if node == p->left or node == p->right:
+					return p
+				stack.push(p)
+				p = p->left
+			elif stack:
+				p = stack.pop()
+				p = p->right
+			else:
+				break
+		return NULL
+
+# binary search tree
+#
+#   left < node < right
+
+class BinarySearchTree(BinaryTree):
+
+	# go down the tree to find appropriate position
+	insert(node):
+		if !node:
+			error("node is invalid")
+		p = root
+		if !p:
+			root = node
+		while p:
+			if node->val < p->val:
+				if p->left:
+					p = p->left
+				else:
+					p->left = node
+					return
+			elif node->val > p->val:
+				if p->right:
+					p = p->right
+				else:
+					p->right = node
+					return
+			else:
+				error("value already exists")
+
+	erase(node):
+		if !node:
+			error("node is invalid")
+		pn = parent(node)
+		pp = NULL
+		if !node->left:
+			p = node->right
+		else:
+			p = node->left
+			# find max element
+			while p->right:
+				pp = p
+				p = p->right
+			if !pp:
+				node->left = p->left
+			else:
+				pp->right = p->left
+			p->left = node->left
+			p->right = node->right
+		if !pn:
+			root = p
+		elif pn->left == node:
+			pn->left = p
+		else:
+			pn->right = p
+		delete node
+		node = NULL
+
+# complete binary tree
+#
+# root		0
+# node		i
+# left		2*i+1
+# right		2*i+2
+# parent	(i-1)//2
+# leaf		>= size//2
+
+class CompleteBinaryTree:
+
+	capacity = M
+	size = 0
+	data = new array[M]
+
+	isleaf(i):
+		return i >= size // 2 and i < size
+
+	left(i):
+		return 2*i + 1
+
+	right(i):
+		return 2*i + 2
+
+	# note that the parent of root is root itself
+	parent(i):
+		return (i-1) // 2
+
+# min heap
+#
+#   parent <= child
+
+class MinHeap(CompleteBinaryTree):
+
+	construct():
+		for i = size // 2 - 1 downto 0:
+			siftdown(i)
+
+	push(val):
+		if size == capacity:
+			error("heap overflow")
+		data[size] = val
+		siftup(size++)
+	
+	pop():
+		if size == 0:
+			error("heap underflow")
+		ret = data[0]
+		data[0] = data[--size]
+		siftdown(0)
+		return ret
+
+	erase(i):
+		if i < 0 or i >= size:
+			error("index out of range")
+		data[i] = data[--size]
+		if data[i] < data[parent(i)]:
+			siftup(i)
+		else:
+			siftdown(i)
+
+	siftup(i):
+		tmp = data[i]
+		while i > 0 and tmp < data[parent(i)]:
+			data[i] = data[parent(i)]
+			i = parent(i)
+		data[i] = tmp
+
+	siftdown(i):
+		tmp = data[i]
+		j = left(i)
+		while j < size:
+			if j+1 < size and data[j+1] < data[j]:
+				++j
+			if data[j] < tmp:
+				data[i] = data[j]
+				i = j
+				j = left(j)
+			else:
+				break
+		data[i] = tmp

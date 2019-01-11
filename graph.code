@@ -1,0 +1,174 @@
+# ...
+class Edge:
+	from = -1
+	to = -1
+	weight = 0
+
+	is_valid():
+		return from != 0 and to != 0
+			and 0 < weight and weight < inf
+
+class Graph:
+	n_vertex = n
+	n_edge = 0
+	visited = array(n, false)
+	indegree = array(n, 0)
+
+	depth_first_search(vertex):
+		visit(vertex)
+		visited[vertex] = true
+		e = first_edge(vertex)
+		while e.is_valid():
+			if !visited[e.to]:
+				depth_first_search(e.to)
+			e = next_edge(e)
+
+	breadth_first_search(vertex):
+		visit(vertex)
+		visited[vertex] = true
+		queue.enqueue(vertex)
+		while queue:
+			v = queue.dequeue()
+			e = first_edge(v)
+			while e.is_valid():
+				if !visited[e.to]:
+					visit(e.to)
+					visit[e.to] = true
+					queue.enqueue(e.to)
+
+	topsort_queue():
+		n_visited = 0
+		queue.enqueue(all vertices that has 0 indegree)
+		while queue:
+			v = q.dequeue()
+			visit(v)
+			++n_visited
+			e = first_edge(v)
+			while e.is_valid():
+				--indegree[e.to]
+				if indegree[e.to] == 0:
+					queue.enqueue(e.to)
+				e = next_edge(e)
+		if visited < n_vertex:
+			print "has ring"
+
+class MatGraph(Graph):
+	mat = matrix(rows=n, cols=n, 0)
+
+	first_edge(vertex):
+		e = Edge(from=vertex)
+		return next_edge(e)
+
+	next_edge(e):
+		ret = Edge(from=e.from, to=e.to+1)
+		while ret.to < n_vertex:
+			ret.weight = mat[ret.from][ret.to]
+			if ret.weight:
+				break
+			else:
+				++ret.to
+		return ret
+
+	set_edge(from, to, weight):
+		if !mat[from][to]:
+			++n_edge
+			++indegree[to]
+		mat[from][to] = weight
+
+	rm_edge(from, to):
+		if mat[from][to]:
+			--n_edge
+			--indegree[to]
+		mat[from][to] = 0
+
+class ToEdge:
+	to = -1
+	weight = 0
+
+class LinkGraph(Graph):
+	data = array(n, ForwardList<ToEdge>)
+
+	first_edge(from):
+		to_edge = data[from].head
+		return Edge(from, to_edge->to, to_edge->weight)
+
+	next_edge(e):
+		to_edge = find_before(e.from, e.to+1)
+		return Edge(e.from, to_edge->next->to, to_edge->next->weight)
+
+	find_before(from, to):
+		to_edge = data[from].head
+		while to_edge->next and to_edge->next->to < to:
+			to_edge = to_edge->next
+		return to_edge
+
+	set_edge(from, to, weight):
+		to_edge = find_before(from, to)
+		if to_edge->next and to_edge->next->to == to:
+			to_edge->next->weight = weight
+		else:
+			data[from].insert_after(to_edge, ToEdge(to, weight))
+			++n_edge
+			++indegree[to]
+
+	rm_edge(from, to):
+		to_edge = find_before(from, to)
+		if to_edge->next and to_edge->next->to == to:
+			erase_after(to_edge)
+			--n_edge
+			--indegree[to]
+
+class IOEdge:
+	from
+	to
+	next_in
+	next_out
+
+class OrthogonalListGraph(Graph):
+	data = array(n, in_edge, out_edge)
+
+# Dijkstra's algorithm for single source shortest path
+Dijkstra(G, s):
+	for v in G:
+		v.dist = inf
+		v.prev = None
+		v.heap_idx = -1
+	s.dist = 0
+	# implement heap by hand
+	minheap.build(G.vertices)
+	for i = 0 .. G.n_vertex-1:
+		v = minheap.pop()
+		for e in v.edges():
+			if e.to.dist > v.dist + e.weight:
+				e.to.dist = v.dist + e.weight
+				e.prev = v
+				minheap.update(e.to.heap_idx)
+
+# Floyd's algorithm for every pair of vertices
+Floyd(G):
+	# stores the shortest distance from i to j
+	dist[i][j] = {
+		0,				if i == j
+		weight[i][j],	if i != j and edge(i, j) exists
+		inf,			if i != j and edge(i, j) does not exist
+	}, i, j = 0 ... G.n_vertex
+
+	# stores the last point before the goal
+	last[i][j] = {
+		i,		if i == j
+		i,		if i != j and edge(i, j) exists
+		None,	if i != j and edge(i, j) does no exist
+	}, i, j = 0 ... G.n_vertex
+
+	for mid = 0 ... G.n_vertex:
+		for i = 0 ... G.n_vertex:
+			for j = 0 ... G.n_vertex:
+				if dist[i][j] > dist[i][mid] + dist[mid][j]:
+					dist[i][j] = dist[i][mid] + dist[mid][j]
+					last[i][j] = last[mid][j]
+
+# Prim's algorithm for minimum-cost spanning tree
+# suitable for dense graph
+
+# Kruskal's algorithm for minimum-cost spanning tree
+# suitable for sparce graph
