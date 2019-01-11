@@ -1,0 +1,163 @@
+习题 5
+
+1. 证明: 设二叉树结点值两两不同, 前序周游序列和中序周游序列唯一确定一棵二叉树.
+
+	证: 当二叉树的结点数 n = 0 或 n = 1 时, 结论显然.
+	当 n > 1 时, 假设结论对 0, 1, ..., n-1 成立, 则
+	先从前序序列中取出根结点 (即第一个结点), 在中序序列中找到此结点
+	(因为结点值两两不同, 这个结点是唯一确定的),
+	此结点前的 k 个结点属于左子树, 此结点后的 n-k-1 个结点属于右子树.
+	这样就可以在前序序列中分别定位到属于左子树和右子树的结点.
+	由归纳假设, 左子树与右子树被唯一确定, 从而这棵二叉树是唯一确定的.
+
+5. 写一个递归函数, 计算二叉树的叶结点个数.
+
+	count_node(root):
+		if !root:
+			return 0
+		return count_node(root->left) + count_node(root->right) + 1
+
+	count_leaf(root):
+		if !root:
+			return 0
+		elif !root->left and !root->right:
+			return 1
+		else
+			return count_leaf(root->left) + count_leaf(root->right)
+
+
+6. 写一个递归函数, 计算二叉树的高度 (只有一个根结点的二叉树高为 1).
+
+	height(root):
+		if !root:
+			return 0
+		return max( height(root->left), height(root->right) ) + 1
+
+7. 设计一个镜面影射算法, 将一棵二叉树的每个结点的左, 右子结点交换位置,
+	例如将图 5.22(a) 所示的二叉树转化为图 5.22(b).
+
+	图 5.22
+			(a)                 (b)
+			        A                      A
+			      /   \                  /   \
+			     B     C                C     B
+			    /    /   \            /   \    \
+			   D    E     F          F     E    D
+			         \   / \        / \   /
+					  G H   I      I   H G
+
+	mirror(root):
+		if !root:
+			return
+		mirror(root->left)
+		mirror(root->right)
+		tmp = root->left
+		root->left = root->right
+		root->right = tmp
+
+14. 编写一个递归函数 search(), 传入参数为一棵二叉树 (不是二叉搜索树 BST)
+和一个值 K, 如果值 K 出现在树中则返回 true, 否则返回 false. 相应地,
+写出一个等价的非递归函数 search().
+
+	# preorder
+	search(root, K):
+		if !root:
+			return false
+		if root->val == K:
+			return true
+		return search(root->left, K) or search(root->right, K)
+
+	# preorder
+	search_nonrec(root, K):
+		s = Stack()
+		s.push(NULL)
+		while root:
+			if root->val == K:
+				return true
+			if root->right:
+				s.push(root->right)
+			if root->left:
+				root = root->left
+			else:
+				root = s.pop()
+		return false
+
+17. 编写一个 is_bst(), 传入参数为一棵二叉树, 如果该二叉树是 BST 则返回
+true, 否则返回 false.
+
+	is_bst(root):
+		if !root:
+			return true
+		if root->left and root->left->val >= root->val:
+			return false
+		if root->right and root->right->val <= root->val:
+			return false
+		return is_bst(root->left) and is_bst(root->right)
+
+18. 编写一个函数 is_min_heap(), 传入参数为一个数组,
+如果该数组中的值满足最小堆的定义则返回 true, 否则返回 false.
+
+	left(i):
+		return 2*i+1
+
+	right(i):
+		return 2*i+2
+
+	do_is_min_heap(arr, i, size):
+		if i >= size: # empty heap
+			return true
+		if left(i) < size and arr[left(i)] < arr[i]:
+			return false
+		if right(i) < size and arr[right(i)] < arr[i]:
+			return false
+		return do_is_min_heap(arr, left(i), size)
+			and do_is_min_heap(arr, right(i), size)
+		
+	is_min_heap(arr, size):
+		return do_is_min_heap(arr, 0, size)
+	
+实验 5
+
+1. 利用扩充二叉树的前序周游序列创建二叉树, 输出各种周游结果,
+验证创建正确性.
+
+	# A B D null null null C E null G null null F H null null I null null
+
+	# construct from a extended preorder sequence
+	# size > 0 because null tree takes [null]
+	# null is not NULL, which means null pointer
+	construct(preorder_arr, size, null):
+		root = NULL
+		i = 0
+		do_construct(preorder_arr, size, i, root, null)
+
+	# i is reference to int
+	# p is reference to pointer
+	do_construct(preorder_arr, size, i, p, null):
+		if preorder_arr[i++] != null:
+			p = new BinaryTreeNode(preorder_arr[i-1], NULL, NULL)
+			if i == size:
+				return
+			do_construct(preorder_arr, size, i, p->left, null)
+			do_construct(preorder_arr, size, i, p->right, null)
+
+2. 利用扩充二叉树的层次周游序列创建二叉树, 输出各种周游结果,
+验证创建正确性.
+
+	construct(levelorder_arr, size):
+		root = NULL
+		q = Queue() # stores reference to pointer
+		q.enqueue(root)
+		i = 0
+		while !q.empty() and i != size:
+			p = q.dequeue()
+			if levelorder_arr[i] != null:
+				p = new BinaryTreeNode(levelorder_arr[i], NULL, NULL)
+				q.enqueue(p->left)
+				q.enqueue(p->right)
+			++i
+
+3. 用最小堆类封装优先队列类, 测试正确性.
+
+	include "heap.h"
+	Heap::test()

@@ -1,0 +1,124 @@
+习题 4
+
+4. S 是一个存放在数组中长为 n 的字符串, 试编写一个程序将 S
+按下述要求改造之后输出:
+	(1) 将 S 的所有偶数位上的字符按照其原来的下标从大到小的次序放在 S
+	的后半部分.
+	(2) 将 S 的所有奇数位上的字符按照其原来的下标从小到大的次序放在 S
+	的前半部分.
+例如, S = "ABCDEFGHIJKL", 改造后的 S 为 "ACEGIKLJHFDB".
+
+	shuffle(S):
+		scopy = string(S.length)
+		i = 0
+		j = 0
+		while i < S.length:
+			scopy[j] = S[i]
+			scopy[S.length-1-j] = S[i+1]
+			i += 2
+			j += 1
+		S = scopy
+
+7. 设计一个线性算法来判断串 T 是否是另一个串 T' 的循环反转, 例如 arc 和
+car 便互为循环反转.
+
+	# for example, match 'arcar' with pattern 'car'
+	are_cyclic_permutations(T, T'):
+		n = T.length
+		if T'.length != n:
+			return false
+		elif n == 0:
+			return true
+		pi = compute_prefix_function(T') # the same as 'KMP'
+		q = -1
+		for i = 0 .. 2*n-2:
+			while q != -1 and T'[q+1] != T[i % n]:
+				q = pi[q]
+			if T'[q+1] == T[i % n]:
+				++q
+			if q == n-1:
+				delete pi
+				return true
+		delete pi
+		return false
+
+上机题 4
+
+1. 给出函数 atoi(x) 的实现方法, 其功能是将字符串 x 转换为整数, 字符串 x 由
+0~9 十个数字和表示负数的 "-" 符号组成, 返回值为整型数值.
+
+	# argument to int
+	# convert string to int (range INT_MIN ~ INT_MAX)
+	# usually, INT_MIN = -2147483648, INT_MAX = 2147483647
+	atoi(x):
+		ret = 0
+		i = 0
+		negative = false
+		# empty str returns 0
+		if x.empty():
+			return 0
+		# eat spaces
+		while i != x.length() and isspace(x[i]):
+			++i
+		# check the sign
+		if x[i] == '+':
+			++i
+		elif x[i] == '-':
+			--i
+			negative = true
+		# read the digits
+		while i != x.length() and isdigit(x[i]):
+			diff = x[i] - '0'
+			# if ret > (INT_MAX - diff)/10:
+				# return INT_MIN if negative else INT_MAX
+			ret = 10 * ret + diff
+			++i
+		return -ret if negative else ret
+
+2. 设计算法来统计一个输入字符串中所包含的整数个数, 并输出这些数.
+假设输入的字符串既有数字又有非数字字符, 例如 ak123x456 17960? 302gef4563,
+其中连续数字作为一个整体看成整数, 例如其中的 123, 456 等.
+
+	find_digit(i, str):
+		while i < str.length and !isdigit(str[i]):
+			++i
+		print(str[i])
+		return i
+
+	find_non_digit(i, str):
+		while i < str.length and isdigit(str[i]):
+			print(str[i++])
+		print(' ')
+		return i
+
+	count_int(str):
+		count = 0
+		i = find_digit(0, str)
+		while i < str.length:
+			i = find_non_digit(i+1, str)
+			++count
+			if i < str.length:
+				i = find_digit(i+1, str)
+			else:
+				break
+		print('\n')
+		return count
+
+3. 编写算法, 对给定的字符串 str, 返回其最长重复子串及其下标位置. 例如, str
+= "abcdacdac", 则子串 "cdac" 是 str 的最长重复子串, 下标为 2.
+
+	# O(n^2)
+	longest_repeat_substr(str):
+		n = str.length
+		if n == 0:
+			return -1, 0
+		index = 0
+		len = 1
+		for i = 0..n-1:
+			pi = compute_prefix_function(str[i:n])
+			tmp = max(pi) + 1
+			if tmp > len:
+				index = i
+				len = tmp
+		delete pi
+		return index, len

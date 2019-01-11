@@ -1,0 +1,75 @@
+习题 6
+
+3. 将图 6.19 中的二叉树转换为对应的森林, 分别按照先根次序,
+后根次序列出其结点.
+
+	图 6.19
+               A
+			 /   \
+		   B       H
+		  / \     / \
+		 E   C   I   K
+		    / \   \
+		   F   D   J
+		    \
+			 G
+
+	答: 对应的森林为
+	                           
+	     A          H      K
+	    /|\        / \
+	   B C D      I   J
+	  / / \
+	 E F   G
+
+	先根次序: A B E C F G D H I J K
+	后根次序: E B F G C D A I J H K
+
+3.5 给出图 6.19 对应的森林的双标记先根序列, 双标记层次序列.
+
+	双标记先根序列:
+
+	val			A B E C F G D H I J K
+	has_child	1 1 0 1 0 0 0 1 0 0 0
+	has_sibling 1 1 0 1 1 0 0 1 1 0 0
+
+	双标记层次序列:
+
+	val			A H K B C D I J E F G
+	has_child	1 1 0 1 1 0 0 0 0 0 0
+	has_sibling 1 1 0 1 1 0 1 0 0 1 0
+
+6. 编写一个函数, 以一棵树为输入, 返回树的结点数目.
+
+	count_node(root):
+		if !root:
+			return 0
+		return count_node(root->child) + count_node(sibling) + 1
+
+实验 6
+
+1. 创建一棵 "长子-兄弟" 表示的树, 输出其双标记先根序列, 双标记层次序列.
+
+	include "tree.h"
+	Tree t
+	preorder_ziptree[] = t.zip_pre()
+	levelorder_ziptree[] = t.zip_level()
+	print(preorder_ziptree, levelorder_ziptree)
+
+2. 给出一个森林的双标记先根序列, 创建对应的 "长子-兄弟" 表示的树,
+输出各种周游序列.
+
+	include "tree.h"
+	preorder_ziptree[] = input()
+	t = Tree(preorder_ziptree)
+	for display in display_methods:
+		print(t)
+
+3. 给出一个森林的双标记层次序列, 创建对应的 "长子-兄弟" 表示的树,
+输出各种周游序列.
+
+	include "tree.h"
+	levelorder_ziptree[] = input()
+	t = Tree(levelorder_ziptree)
+	for display in display_methods:
+		print(t)

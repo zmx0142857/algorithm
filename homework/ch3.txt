@@ -1,0 +1,190 @@
+习题 3
+
+3. 试按以下的要求把栈 S 中的元素逆置:
+	(1) 使用额外的两个栈.
+	(2) 使用额外的一个队列.
+	(3) 使用额外的一个栈, 外加一些非数组的变量.
+
+	reverse1(S):
+		s1 = Stack()
+		s2 = Stack()
+		while !S.empty():
+			s1.push(S.pop())
+		while !s1.empty():
+			s2.push(s1.pop())
+		while !s2.empty():
+			S.push(s2.pop())
+
+	reverse2(S):
+		q = Queue()
+		while !S.empty():
+			q.enqueue(S.pop())
+		while !q.empty():
+			S.push(q.dequeue())
+
+	# costs more time: O(n^2)
+	reverse3(S):
+		s1 = Stack()
+		n = S.size()
+		if n == 0:
+			return
+		while --n:
+			tmp = S.pop()
+			repeat n:
+				s1.push(S.pop())
+			S.push(tmp)
+			while !s1.empty():
+				S.push(s1.pop())
+
+6. 试在一个长度为 n 的数组中实现两个栈, 使得二者在元素的总数目为 n
+之前都不溢出, 并且保证 push 和 pop 操作的时间代价为 O(1).
+
+	class DoubleStack:
+
+		capacity = n
+		ltop = 0
+		rtop = n-1
+		data = new array[n]
+
+		destruct():
+			delete[] stack
+
+		lclear():
+			ltop = 0
+
+		rclear():
+			rtop = capacity-1
+
+		lpush(val):
+			if ltop > rtop:
+				error("stack overflow")
+			stack[ltop++] = val
+
+		rpush(val):
+			if ltop > rtop:
+				error("stack overflow")
+			stack[rtop--] = val
+
+		lpop():
+			if ltop == 0:
+				error("stack underflow")
+			return stack[--ltop]
+
+		rpop():
+			if rtop == capacity-1:
+				error("stack underflow")
+			return stack[++rtop]
+
+		lget():
+			if ltop == 0:
+				error("stack is empty")
+			return stack[ltop-1]
+
+		rget():
+			if rtop == capacity-1:
+				error("stack is empty")
+			return stack[rtop+1]
+
+		lsize():
+			return ltop
+
+		rsize():
+			return capacity-1-rtop
+
+补充1. n 个元素入栈顺序为 1, 2, ..., n, 所有可能出栈顺序有多少种?
+所有的出栈序列是哪些? 提示: 分治法, Catalan Number.
+
+	答: n = 1 时, C_1 = 1;
+	设数字 1 出栈后, 还有 k 个元素尚未入栈.
+	注意此时栈一定为空, 所以之后的选择共有 C_k 种.
+	而 1 入栈后至 1 出栈前的选择共有 C_(n-k-1) 种.
+	求和得 C_n = sum_(k=0)^(n-1) C_k * C_(n-k-1).
+	利用生成函数法可求得 C_n = 1/(n+1) choose(2n, n)
+	这就是 Catalan Number 的一个实例.
+
+上机题 3
+
+3. 试利用非数组变量, 按下述条件各设计一个相应的算法以使队列中的元素有序:
+	(1) 使用两个辅助的队列.
+	(2) 使用一个辅助的队列.
+
+	# think about merge sort: O(n lg n)
+	sort1(q):
+		q1 = Queue()
+		q2 = Queue()
+		for gap = 1; gap < q.size(); gap *= 2;
+			# divide
+			while !q.empty():
+				n = gap
+				while !q.empty() and n--:
+					q1.enqueue(q.dequeue())
+				n = gap
+				while !q.empty() and n--:
+					q2.enqueue(q.dequeue())
+			# merge
+			while !q1.empty() and !q2.empty():
+				i = j = gap;
+				while !q1.empty() and !q2.empty() and i and j:
+					if q1.get() <= q2.get():
+						q.enqueue(q1.dequeue())
+						--i
+					else:
+						q.enqueue(q2.dequeue())
+						--j
+				while !q1.empty() and i--:
+					q.enqueue(q1.dequeue())
+				while !q2.empty() and j--:
+					q.enqueue(q2.dequeue())
+			while !q1.empty():
+				q.enqueue(q1.dequeue())
+			while !q2.empty():
+				q.enqueue(q2.dequeue())
+
+	# select sort, O(n^2)
+	# helper queue rotates itself to get desired min element
+	sort2(q):
+		if q.size() < 2:
+			return
+		q1 = Queue()
+		min = q.get()
+		q1.enqueue(q.dequeue())
+		while !q.empty():
+			if q.get() < min:
+				min = q.get()
+			q1.enqueue(q.dequeue())
+		while !q1.empty():
+			last_min = min
+			min = q1.get()
+			i = 0
+			while !q1.empty() and i < q1.size():
+				if q1.get() == last_min:
+					q.enqueue(q1.dequeue())
+				else:
+					q1.enqueue(q1.dequeue())
+					if q1.get() < min:
+						min = q1.get()
+				++i
+
+4. 试按下述条件各设计一个算法把栈 s1 中的元素转移到栈 s2 中,
+并保持栈中元素原来的顺序:
+	(1) 使用一个辅助栈.
+	(2) 只使用一些辅助的非数组变量.
+
+	# O(n)
+	move1(s1, s2):
+		s = Stack()
+		while !s1.empty():
+			s.push(s1.pop())
+		while !s.empty():
+			s2.push(s.pop())
+
+	# O(n^2)
+	move2(s1, s2):
+		n = s1.size()
+		while n--:
+			repeat n:
+				s2.push(s1.pop())
+			tmp = s1.pop()
+			repeat n:
+				s1.push(s2.pop())
+			s2.push(tmp)
