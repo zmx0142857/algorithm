@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char verbose = 1;
+int cnt = 0;
+int verbose = 0; // output level, 0 to 2
 
 void swap(int *p, int *q)
 {
@@ -14,7 +15,7 @@ char is_valid(int *s, int beg)
 {
 	for (int i = 0; i < beg; ++i) {
 		// on conflict returns false
-		if (s[i] == s[beg] || beg+s[i] == s[beg]+i || beg+s[beg] == i+s[i])
+		if (beg+s[i] == s[beg]+i || beg+s[beg] == i+s[i])
 			return 0;
 	}
 	return 1;
@@ -22,18 +23,20 @@ char is_valid(int *s, int beg)
 
 void output(int *s, int n)
 {
-	if (verbose) {
+	if (verbose == 2) {
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < n; ++j) {
 				printf(j == s[i] ? "Q " : ". ");
 			}
 			puts("");
 		}	
-	} else {
+		puts("");
+	} else if (verbose == 1) {
 		for (int i = 0; i < n; ++i)
 			printf("%d ", s[i]);
+		puts("");
 	}
-	puts("");
+	++cnt;
 }
 
 void permutate(int *s, int beg, int end)
@@ -52,10 +55,13 @@ void permutate(int *s, int beg, int end)
 
 void queens(int n)
 {
+	cnt = 0;
+	/*
 	if (n < 1 || n > 9) {
 		puts("n must in range 1...9");
 		return;
 	}
+	*/
 
 	// init solution
 	// (i, solution[i]), i = 0 ... n-1
@@ -64,10 +70,13 @@ void queens(int n)
 	for (int i = 0; i < n; ++i)
 		solution[i] = i;
 	permutate(solution, 0, n);
+	printf("%d solutions\n", cnt);
 }
 
-int main()
+int main(int argc, char **argv)
 {
+	if (argc > 1)
+		verbose = atoi(argv[1]);
 	int n;
 	printf("n = ");
 	while (scanf("%d", &n) == 1) {
