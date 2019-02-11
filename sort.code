@@ -1,3 +1,48 @@
+#### O(n^2) ####
+
+insertion_sort(L):
+	for i = 1 to L.length-1:
+		pivot = L[i]
+		j = i
+		while j >= 1 and L[j-1] > pivot:
+			L[j] = L[j-1]
+			--j
+		L[j] = pivot
+		# L[0...i] is sorted
+
+selection_sort(L):
+	for i = 0 to L.length-1:
+		min = i
+		for j = i+1 to L.length-1
+			if L[j] < L[min]
+				min = j
+		# L[min] is the minimum of L[i...L.length-1]
+		swap(L, min, i)
+
+bubble_sort(L):
+	for i = 1 to L.length-1:
+		for j = 0 to L.length-i:
+			if (L[j] > L[j+1])
+				swap(L, j, j+1)
+
+#### O(n^???) ####
+
+# a generalized version of insertion sort
+shell_sort(L):
+	gap = L.length // 2
+	while gap > 0:
+		for i = gap to L.length-1:
+			pivot = L[i]
+			j = i
+			while j >= gap and L[j-gap] > pivot:
+				L[j] = L[j-gap]
+				j -= gap
+			L[j] = pivot
+		gap //= 2
+
+#### O(n log n) ####
+
+# helper function for quick_sort
 quick_sort_partition(L, beg, end)
 	pivot = L[end-1]
 	i = beg
@@ -34,12 +79,52 @@ do_quick_sort(L, beg, end):
 quick_sort(L):
 	do_quick_sort(L, 0, L.length)
 
-insert_sort(L):
-	for i = 1...L.length-1:
-		pivot = L[i]
-		j = i-1
-		while j != -1 and L[j] > pivot:
-			L[j+1] = L[j]
-			--j
-		L[j+1] = pivot
-		# L[0...i] is sorted
+# merge a[beg ... mid) and a[mid ... end) into b[beg ... end)
+merge(a, b, beg, mid, end):
+	i = beg
+	j = mid
+	k = beg
+	while i < mid and j < end:
+		if a[i] <= a[j]
+			b[k++] = a[i++]
+		else
+			b[k++] = a[j++]
+	while i < mid:
+		b[k++] = a[i++]
+	while j < end:
+		b[k++] = a[j++]
+
+# sort [beg ... end)
+do_merge_sort(a, b, beg, end):
+	if beg + 1 < end: # [beg ... end) has at least two elements
+		mid = (beg+end) // 2
+		do_merge_sort(b, a, beg, mid)	# n // 2 elements
+		do_merge_sort(b, a, mid, end)	# n // 2 + 1 elements
+		merge(a, b, beg, mid, end)
+
+merge_sort(L)
+	L1 = copy(L)
+	do_merge_sort(L1, L, 0, L.length)
+	free memory of L1
+
+# make the subtree rooted at i a max-heap
+heapify(L, i, end):
+	top = L[i]
+	while i < end/2:	# i has a child
+		j = 2*i+1		# left child
+		# if right child exists and greater than left child, choose it
+		if j+1 < end and L[j] < L[j+1]:
+			++j
+		if L[j] <= top:
+			break
+		L[i] = L[j]
+		i = j
+	L[i] = top
+
+heap_sort(L):
+	# build heap: make L a max-heap
+	for i = L.length//2 - 1 downto 0:
+		heapify(L, i, L.length)
+	for i = L.length-1 downto 1:
+		swap(L, 0, i)
+		heapify(L, 0, i)
