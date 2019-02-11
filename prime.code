@@ -11,7 +11,7 @@ primes(n):
 	is_prime = [false, false, true,
 		true, false, true, false, true, ... ]
 
-	# ailatoseni sieve
+	# Eratoschenes sieve method
 	i = 3
 	while i**2 <= n:
 		if is_prime[i]:

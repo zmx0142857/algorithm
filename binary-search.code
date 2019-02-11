@@ -1,15 +1,29 @@
 # returns true iff val in L
 binary_search(L, val):
 	if L.empty():
-		return false
+		return 'L is empty', false;
 	lo = 0
 	hi = L.length-1
 	while lo < hi:
 		mid = (lo+hi) // 2
-		if L[mid] < val:
+		if val > L[mid]:
 			lo = mid+1
-		elif L[mid] > val:
+		elif val < L[mid]:
 			hi = mid-1
 		else:
-			return true
-	return L[lo] == val
+			return 'val == L[mid]', true
+	
+	if val == L[lo]:
+		return 'val == L[lo]', true
+	elif val < L[lo]:
+		while val < L[lo]:
+			if lo == 0:
+				return 'val < L[0]', false
+			--lo
+	else:
+		while val > L[lo]:
+			if lo == len-1:
+				return 'val > L[len-1]', false
+			++lo
+		--lo
+	return 'L[lo] < val < L[lo+1]', false
