@@ -16,6 +16,18 @@ class ForwardList:
 	construct(arr, size):
 		while size > 0:
 			push_front(arr[--size])
+
+	# read from stdin until zero is read
+	construct(stdin):
+		head = tail = NULL
+		if (val = input()) and data != 0:
+			# first node
+			head = tail = new ForwardListNode(data)
+			while (val = input) and data != 0):
+				p = tail
+				tail = new ForwardListNode(data)
+				p->next = tail
+			tail->next = NULL
 	
 	destruct():
 		while !empty():
@@ -60,6 +72,22 @@ class ForwardList:
 		tmp = head
 		head = head->next
 		delete tmp
+
+	erase(condition):
+		while head and condition(head->val):
+			del = head
+			head = head->next
+			delete del
+		if !head:
+			return
+		p = head
+		while p->next:
+			if condition(p->next->val):
+				del = p->next
+				p->next = del->next
+				delete del
+			else:
+				p = p->next
 	
 	to_str():
 		buffer = '['

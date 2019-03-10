@@ -1,3 +1,4 @@
+# find val in sorted array L
 # returns true iff val in L
 binary_search(L, val):
 	if L.empty():
@@ -5,7 +6,7 @@ binary_search(L, val):
 	lo = 0
 	hi = L.length-1
 	while lo < hi:
-		mid = (lo+hi) // 2
+		mid = (lo+hi) >> 1
 		if val > L[mid]:
 			lo = mid+1
 		elif val < L[mid]:
@@ -15,6 +16,8 @@ binary_search(L, val):
 	
 	if val == L[lo]:
 		return 'val == L[lo]', true
+	# else:
+	#     return 'val not in L', false
 	elif val < L[lo]:
 		while val < L[lo]:
 			if lo == 0:
@@ -22,8 +25,8 @@ binary_search(L, val):
 			--lo
 	else:
 		while val > L[lo]:
-			if lo == len-1:
-				return 'val > L[len-1]', false
+			if lo == L.length-1:
+				return 'val > L[L.length-1]', false
 			++lo
 		--lo
 	return 'L[lo] < val < L[lo+1]', false

@@ -1,0 +1,24 @@
+# quick power
+pow(base, exp, module):
+	ret = 1
+	# iterate over each bit of exp
+	mask = 1 << |_ log2(exp) _|
+	while mask != 0:
+		ret = ret**2 % module
+		if exp & mask:
+			ret = ret * base % module
+		mask >> 1
+	return ret
+
+# sqrare root for integers
+# returns floor(sqrt(x)) if x >= 0
+# returns -1 if x < 0
+int isqrt(int x):
+	if x < 0: return -1
+	if x == 0: return 0
+	ret = 1
+	do:
+		last = ret
+		ret = (ret + x/ret) >> 1;
+	while ret != last
+	return ret

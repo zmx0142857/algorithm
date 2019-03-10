@@ -5,11 +5,10 @@ primes(n):
 	print 2
 
 	# init boolean array
-	# 0, 1 are not primes
-	# 2 is prime
-	# consider odd numbers as primes
+	# 0, 1 are not primes; 2 is prime; consider odd numbers as primes
+	# better to set the array size bigger than n
 	is_prime = [false, false, true,
-		true, false, true, false, true, ... ]
+		true, false, true, false, true, ... ] # size n+10
 
 	# Eratoschenes sieve method
 	i = 3
