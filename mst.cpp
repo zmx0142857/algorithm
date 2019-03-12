@@ -86,6 +86,7 @@ struct KruskalEdge {
 void naive_kruskal(Graph g)
 {
 	cout << "naive kruskal\n";
+	Id cnt = 0;
 
 	// 初始化 N 棵树 (连通分量), 每棵树只有一个顶点
 	// 这里令第 i 个顶点属于第 i 棵树
@@ -112,6 +113,7 @@ void naive_kruskal(Graph g)
 
 		// from, to 不在一颗树上时, 合并两颗树
 		if (tree[from] != tree[to]) {
+			++cnt;
 			Id tree_to = tree[to];
 			for (Id j = 0; j < N; ++j) {
 				if (tree[j] == tree_to) {
@@ -121,6 +123,8 @@ void naive_kruskal(Graph g)
 			add_edge(from, to, cost);
 		}
 	}
+	if (cnt < N-1)
+		cout << "error: the graph is not connected";
 	cout << endl;
 }
 
@@ -156,6 +160,7 @@ void merge(Id a, Id b)
 void kruskal(Graph g)
 {
 	cout << "kruskal\n";
+	Id cnt = 0;
 
 	// 初始化 N 棵树 (连通分量), 每棵树只有一个顶点
 	// 使用并查集表示这些树
@@ -181,10 +186,13 @@ void kruskal(Graph g)
 		Id root_from = root(edges[i].from);
 		Id root_to = root(edges[i].to);
 		if (root_from != root_to) {
+			++cnt;
 			merge(root_from, root_to);
 			add_edge(edges[i].from, edges[i].to, edges[i].cost);
 		}
 	}
+	if (cnt < N-1)
+		cout << "error: the graph is not connected";
 	cout << endl;
 }
 
