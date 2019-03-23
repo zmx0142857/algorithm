@@ -1,4 +1,41 @@
-# suppose m > 0
+# [find pattern P in text T]
+#
+# in the following example, an offset of s=4 matches q=5 chars:
+# 
+# [ b a c b a b a b a a b c b a b ] T
+#			| | | | |
+#  s ---> [ a b a b a c a ] P
+#
+# note that pi[q] = k=3, that is to say, P[0:k-1] is the longest prefix
+# of P to be a postfix of P[0:q-1]:
+#
+# [a b a b a ] P[0:q-1] := P_q
+#	   | | |
+#    [ a b a ] P[0:k-1] := P_k
+#
+# so the next possible offset is s + (q - pi[q]) = s + 2.
+
+
+# [compute the prefix function]
+#
+# ITERATIVE LEMMA OF PREFIX FUNCTION:
+# let P is a pattern of length m, pi is the prefix function of P.
+#
+#	pi*[q] := { k: k < q and p[0:k-1] is postfix of p[0:q-1] },
+#	pi[q] := max pi*[q].
+#
+# we assert that the iteration of pi[q] exhausts the set pi*[q],
+# in other words, if we denote
+#
+#		pi^n[q] = { pi[q],				if n = 1;
+#				  { pi[ pi^(n-1)[q] ],	if n > 1.
+#
+# then
+#
+#	pi*[q] = {pi^1[q], pi^2[q], ..., pi^t[q] = 0}.
+
+
+# p is a string pattern, suppose p.length > 0
 compute_prefix_function(p):
 	m = p.length
 	pi = new array[m]
@@ -26,3 +63,4 @@ kmp_matcher(text, pattern):
 		if q == m:
 			print("pattern occurs in ", i-m+1)
 			q = pi[q]
+
