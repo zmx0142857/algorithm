@@ -1,9 +1,3 @@
-/* compile:
- *	gcc prime.c -o prime -Wall
- * run:
- *	./prime 10000000 > primeout
- *	wc -w primeout # expecting 664579
- */
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,7 +6,8 @@ const bool true = 1;
 const bool false = 0;
 
 bool flag[10000001];
-int primes[664579]; // pi(10^7) = 664579
+//int primes[664579]; // pi(10^7) = 664579
+int primes[5761455]; // pi(10^8) = 5761455
 
 // i is a prime iff flag[i] == true
 // consider odd numbers as primes
@@ -29,7 +24,8 @@ void init(int n)
 // generates primes <= n
 // return 0 if generation exhausted
 int next_prime(int n)
-{ static int p = 2;
+{
+	static int p = 2;
 	if (p > n)
 		return 0;
 	if (p == 2) {
@@ -75,7 +71,7 @@ void factor(int n) {
 	
 }
 
-// slower!
+// slower, 3*10^7 ok, 5*10^7 segmentation fault
 void print_primes1(int n)
 {
 	int p;
@@ -84,7 +80,7 @@ void print_primes1(int n)
 	puts("");
 }
 
-// useful!
+// faster, 10^7 ok, 1.1*10^7 segmentation fault
 void print_primes2(int n)
 {
 	int m, cnt = 0;
@@ -107,7 +103,8 @@ int main(int argc, char *argv[])
 {
 	if (argc == 1) {
 		puts("output primes <= n\n"
-			 "usage: prime n [1/2]");
+			 "usage: prime n 1 (slower but support n=30M)\n"
+			 "       prime n 2 (faster but segmentation fault for n=11M)");
 		return 0;
 	}
 	int n = atoi(argv[1]);
