@@ -5,9 +5,12 @@ typedef char bool;
 const bool true = 1;
 const bool false = 0;
 
-bool flag[10000001];
-//int primes[664579]; // pi(10^7) = 664579
-int primes[5761455]; // pi(10^8) = 5761455
+bool flag[1000000001];
+// n	  pi(10^n)
+// 7	   664,579
+// 8	 5,761,455
+// 9	50,847,534
+int primes[50847534];
 
 // i is a prime iff flag[i] == true
 // consider odd numbers as primes
@@ -86,10 +89,13 @@ void print_primes2(int n)
 	int m, cnt = 0;
 	for (int i = 2; i <= n; ++i) {
 		// i is a prime iff flag[i] == false
-		if (!flag[i])
+		if (!flag[i]) {
 			primes[cnt++] = i;
+		}
 		for (int j = 0; (m = i * primes[j]) <= n; ++j) {
 			flag[m] = true;
+			// only sieve once if i is a compound number containing
+			// factor primes[j]
 			if (i % primes[j] == 0)
 				break;
 		}
@@ -103,8 +109,8 @@ int main(int argc, char *argv[])
 {
 	if (argc == 1) {
 		puts("output primes <= n\n"
-			 "usage: prime n 1 (slower but support n=30M)\n"
-			 "       prime n 2 (faster but segmentation fault for n=11M)");
+			 "usage: prime n 1 (less memory)\n"
+			 "       prime n 2 (faster)");
 		return 0;
 	}
 	int n = atoi(argv[1]);
