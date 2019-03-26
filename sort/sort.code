@@ -42,8 +42,31 @@ shell_sort(L):
 
 #### O(n log n) ####
 
+# sort L[low...high], where high should be L.length-1
+qsort2(L, low, high):
+	if low < high:
+		first = low
+		last = high
+		index = low + rand() % (high-low+1)
+		swap(L, first, index)
+		pivot = L[first]
+
+		do:
+			while first < last and L[last] >= pivot:
+				--last
+			L[first] = L[last]
+			while first < last and L[first] <= pivot:
+				++first
+			L[last] = L[first]
+		while first < last
+
+		# now first == last
+		L[first] = pivot
+		qsort2(L, low, first-1)
+		qsort2(L, first+1, high)
+
 # helper function for quick_sort
-quick_sort_partition(L, beg, end)
+quick_sort_partition(L, beg, end):
 	pivot = L[end-1]
 	i = beg
 	j = end-2								# better use int than unsigned
