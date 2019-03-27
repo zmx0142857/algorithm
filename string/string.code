@@ -64,3 +64,60 @@ kmp_matcher(text, pattern):
 			print("pattern occurs in ", i-m+1)
 			q = pi[q]
 
+
+# argument to int
+# convert string to int (range INT_MIN ~ INT_MAX)
+# usually, INT_MIN = -2147483648, INT_MAX = 2147483647
+atoi(x):
+	ret = 0
+	i = 0
+	negative = false
+	# empty str returns 0
+	if x.empty():
+		return 0
+	# eat spaces
+	while i != x.length() and isspace(x[i]):
+		++i
+	# check the sign
+	if x[i] == '+':
+		++i
+	elif x[i] == '-':
+		--i
+		negative = true
+	# read the digits
+	while i != x.length() and isdigit(x[i]):
+		diff = x[i] - '0'
+		# if ret > (INT_MAX - diff)/10:
+			# return INT_MIN if negative else INT_MAX
+		ret = 10 * ret + diff
+		++i
+	return -ret if negative else ret
+
+# returns true iff the str is palindorme
+# example: Able was I, ere I saw Elba.
+# A man, a plan, a canal; Panama.
+is_palindrome(str):
+	beg = str
+	end = str + str.length-1
+	while beg < end:
+		while !isalpha(*beg):
+			++beg
+		while !isalpha(*end):
+			--end
+		if tolower(*beg) != tolower(*end):
+			return false
+		++beg
+		--end
+	return true
+
+# find first char in str that matches condition
+# returns end of str if not found
+#
+# [example]
+# find first blank char: find_if(str, isspace)
+# find first non-blank char: find_if(str, isprint)
+# find beginning of the next word: find_if(find_if(str, isspace), isprint)
+find_if(str, condition):
+	while *str != '\0' and !condition(*str):
+		++str
+	return str

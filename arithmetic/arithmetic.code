@@ -1,14 +1,24 @@
-# quick power
-pow(base, exp, module):
-	ret = 1
-	# iterate over each bit of exp
-	mask = 1 << |_ log2(exp) _|
-	while mask != 0:
-		ret = ret**2 % module
-		if exp & mask:
-			ret = ret * base % module
-		mask >> 1
-	return ret
+# return absolute value of x
+abs(x):
+	if x < 0:
+		return -x;
+	return x
+
+# returns the number of digits of an int
+count_digit(n, base=10):
+	if n == 0:
+		return 1
+	cnt = 0
+	while num:
+		num //= base
+		++cnt
+	return cnt
+
+# returns the ith digit (start from right) of an int.
+# get_digit(n, 0, base) == n % base
+get_digit(n, i, base=10):
+	n = abs(n)
+	return n // pow(base, n) % base
 
 # sqrare root for integers
 # returns floor(sqrt(x)) if x >= 0
@@ -19,6 +29,52 @@ int isqrt(int x):
 	ret = 1
 	do:
 		last = ret
-		ret = (ret + x/ret) >> 1;
+		ret = (ret + x//ret) >> 1;
 	while ret != last
 	return ret
+
+# quick power
+# if base is int and exp >= 0, it can take another argument modulus
+# pow(0, 0) == 1
+# exp = 14 = [1110] = 2^3 + 2^2 + 2^1 = ((1*2+1)*2)+1)*2
+# base^exp = ((base^2 * base)^2 * base)^2
+pow(base, exp, modulus=INT_MAX):
+	if n < 0:
+		base = 1/base
+		exp = -exp
+	ret = 1
+	# iterate over each bit of exp
+	mask = 1 << |_ log2(exp) _|
+	while mask != 0:
+		ret = ret**2 % module
+		if exp & mask:
+			ret = ret * base % module
+		mask >> 1
+	return ret
+
+# not so efficient
+pow_recur(base, exp):
+	if exp < 0:
+		return pow_recur(1/base, -exp)
+	if exp == 0:
+		return 1
+	tmp = pow_recur(base, exp >> 1);
+	if exp & 1:
+		return tmp**2 * x
+	return tmp**2
+
+# returns base^(1/n)
+# when loop >= 1, ret >= base.
+#     ret^n - base < eps * n * base^(n-1)
+# ==> ret^n - base < eps * (x^(n-1) + x^(n-2)*base^(1/n) + ...
+#     + base^((n-1)/n))
+# ==> ret - base^(1/n) < eps
+root(base, n, eps=1e-8):
+	an = eps * n * pow(base, n-1) + base
+    ret = 1
+    do:
+		ret = ((n-1)*ret + base*pow(ret, 1-n)) / n
+    while pow(ret, n) > an
+    if ret < eps:
+		return 0
+    return ret
