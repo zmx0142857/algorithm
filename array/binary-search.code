@@ -1,0 +1,30 @@
+# find val in sorted array L
+# returns true iff val in L
+binary_search(L, val):
+	if L.empty():
+		return 'L is empty', false
+	lo = 0
+	hi = L.length-1
+	while lo < hi:
+		# (lo + hi) / 2 may cause int overflow
+		# if lo and hi are iterators, lo + hi is not possible
+		mid = lo + ((hi-lo) >> 1)
+		if val == L[mid]:
+			return 'val == L[mid]', true
+		elif val < L[mid]:
+			hi = mid-1
+		else:
+			lo = mid+1
+	
+	if val == L[lo]:
+		return 'val == L[lo]', true
+	elif val < L[lo]:
+		if lo == 0:
+			return 'val < L[lo]', false
+		else:
+			return 'L[lo-1] < val < L[lo]', false
+	else:
+		if (lo == size-1)
+			return 'L[lo] < val', false
+		else:
+			return 'L[lo] < val < L[lo+1]', false

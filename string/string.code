@@ -60,7 +60,7 @@ kmp_matcher(text, pattern):
 			q = pi[q]
 		if pattern[q+1] == text[i]:
 			++q
-		if q == m:
+		if q == m-1:
 			print("pattern occurs in ", i-m+1)
 			q = pi[q]
 
