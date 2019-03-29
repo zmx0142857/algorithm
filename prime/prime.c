@@ -74,7 +74,6 @@ void factor(int n) {
 	
 }
 
-// slower, 3*10^7 ok, 5*10^7 segmentation fault
 void print_primes1(int n)
 {
 	int p;
@@ -83,7 +82,6 @@ void print_primes1(int n)
 	puts("");
 }
 
-// faster, 10^7 ok, 1.1*10^7 segmentation fault
 void print_primes2(int n)
 {
 	int m, cnt = 0;

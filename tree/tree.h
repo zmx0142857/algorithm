@@ -5,6 +5,7 @@
 #include <vector>
 #include <stack>
 #include <queue>
+#include <iostream>
 #include <fstream>
 
 template <class T>
