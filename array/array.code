@@ -1,0 +1,208 @@
+# an auto-resizable array: aka vector
+class Array:
+
+	# ---- constructors and memory management ----
+	construct(cap=0):
+		this.capacity = cap
+		this.len = 0
+		this.L = new array[capacity]
+
+	construct(arr, n):
+		this.capacity = n
+		this.len = n
+		this.L = new array[capacity]
+		for i = 0 to len-1:
+			L[i] = arr[i]
+
+	construct(rhs, cap):
+		this.capacity = cap
+		this.len = rhs.len
+		this.L = new array[capacity]
+		if len > cap:
+			len = cap
+		for i = 0 to len-1:
+			L[i] = rhs.L[i]
+
+	copy(rhs):
+		construct(rhs, rhs.capacity)
+
+	swap(rhs):
+		size_t tmp_len = capacity
+		capacity = rhs.capacity
+		rhs.capacity = tmp_len
+		tmp_len = len
+		len = rhs.len
+		rhs.len = tmp_len
+		tmp = L
+		L = rhs.L
+		rhs.L = tmp
+
+	destruct():
+		delete[] L
+
+	# consider self-assignment carefully
+	assign(rhs): # pass rhs by value!
+		swap(rhs)
+
+	realloc():
+		new_arr = Array(this, 2*capacity)
+		swap(new_arr)
+
+	# ---- deal with len ----
+	clear():
+		len = 0
+
+	size():
+		return len
+
+	empty():
+		return len == 0
+
+	# ---- finder ----
+
+	# return the first index i, such that condition(L[i]) == true
+	# return -1 if not found
+	# if reversed == true, find last instead of first
+	find_if(condition, reversed=false):
+		if !reversed:
+			for i = 0 to len-1:
+				if condition(L[i]):
+					return i
+		else:
+			for i = len-1 downto 0:
+				if condition(L[i]):
+					return i
+		return -1
+
+	# return the first index of val in L
+	# return -1 if not found
+	# if reversed == true, find last instead of first
+	find(val, reversed=false):
+		return find_if(lambda x: x == val, reversed)
+
+	# return true iff L contains val
+    contains(val):
+		return find(val) != -1
+
+	# ---- add & remove ----
+
+	# add val to L as the last element
+	push_back(val):
+		if len == capacity:
+			realloc()
+		L[len++] = val
+
+	# remove last element of L
+	pop_back():
+		if len == 0:
+			error('array is empty')
+		--len
+
+# a sorted array, suitable for set merge operations, etc
+class SortedArray(Array):
+
+	# merge: return a merged sorted array of lhs and rhs
+	construct(lhs, rhs):
+		super.construct(lhs.len + rhs.len)
+		i = j = 0
+		while i < lhs.len and j < rhs.len:
+			if lhs.L[i] > rhs.L[j]:
+				L[len++] = rhs.L[j++]
+			else:
+				L[len++] = lhs.L[i++]
+		while i < lhs.len:
+			L[len++] = lhs.L[i++]
+		while j < rhs.len:
+			L[len++] = rhs.L[j++]
+
+	# binary search
+	# return the (may be not first) index of val in L
+	# return the index val should be inserted if not found
+	#	[1, 3, 5].bsearch(0) = 0
+	#	[1, 3, 5].bsearch(1) = 0
+	#	[1, 3, 5].bsearch(4) = 2
+	#	[1, 3, 5].bsearch(5) = 2
+	#	[1, 3, 5].bsearch(6) = 3
+    bsearch(val):
+        if len == 0:
+            return -1
+        lo = 0
+        hi = len-1
+        while lo < hi:
+			# |_ (lo+hi)/2 _| may cause int overflow, furthermore,
+			# if lo and hi are iterators, lo + hi is not possible
+            mid = lo + ((hi-lo) >> 1)
+			if val == L[mid]:
+				# replace following line with 'return mid' if
+				# there's no need to return first index of val
+				hi = mid
+            elif val < L[mid]:
+				# following 2 lines are needed if using unsigned index
+				if mid == 0:
+					break
+                hi = mid-1
+            else:
+                lo = mid+1
+		# following lines analysis the position of val in L
+#		if val == L[lo]:
+#			'val == L[lo]'
+#		elif val < L[lo]:
+#			if lo == 0:
+#				'val < L[lo]'
+#			else:
+#				'L[lo-1] < val < L[lo]'
+#		else:
+#			if (lo == len-1)
+#				'L[lo] < val'
+#			else:
+#				'L[lo] < val < L[lo+1]'
+		if val <= L[lo]:
+			return lo
+		return lo+1
+
+	# return the (maybe not first) index of val in L
+	# return -1 if not found
+	find(val):
+		i = bsearch(val)
+		if i < len and L[i] == val:
+			return i
+		return -1
+
+	# return true iff L contains val
+    contains(val):
+		return find(val) != -1
+
+	# insert val while L remains ordered
+    add(val):
+		L[len++] = val
+		i = len-1
+		while i > 0 and L[i-1] > val:
+			L[i] = L[i-1]
+			--i
+		L[i] = val
+
+	# remove val while L remains ordered
+	# do nothing if val not in L
+    remove(val):
+		i = find(val)
+        if i != -1:
+            while i < len-1:
+                L[i] = L[i+1]
+                ++i
+			--len
+
+	# return true iff there exists i, j such that
+	# i != j and L[i] + L[j] == val
+    two_sum(val):
+		if len == 0:
+			return false
+        i = 0
+        j = len-1
+        while i < j:
+            if L[i] + L[j] < val:
+                ++i
+            elif L[i] + L[j] > val:
+                --j
+            else:
+                return true, i, j
+        return false
