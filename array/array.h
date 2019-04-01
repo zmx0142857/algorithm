@@ -1,5 +1,5 @@
-#ifndef ARRAY_H
-#define ARRAY_H
+#ifndef Array_h
+#define Array_h
 
 #if __cplusplus < 201101
 #error "require c++11"
@@ -196,43 +196,54 @@ class SortedArray: public Array<T> {
 	SortedArray(const SortedArray &lhs, const SortedArray &rhs):
 		Array<T>(lhs.capacity+rhs.capacity)
 	{
+		T *L = this->L;
+		size_t &len = this->len;
+
 		size_t i = 0, j = 0;
 		while (i < lhs.len && j < rhs.len) {
 			if (lhs.L[i] > rhs.L[j])
-				this->L[this->len++] = rhs.L[j++];
+				L[len++] = rhs.L[j++];
 			else
-				this->L[this->len++] = lhs.L[i++];
+				L[len++] = lhs.L[i++];
 		}
 		while (i < lhs.len)
-			this->L[this->len++] = lhs.L[i++];
+			L[len++] = lhs.L[i++];
 		while (j < rhs.len)
-			this->L[this->len++] = rhs.L[j++];
+			L[len++] = rhs.L[j++];
 	}
 
 	// binary search
 	// return the first index of val in L
 	// return the index val should be inserted if not found
+	// if reversed == true, find last instead of first
 	//	[1, 3, 5].bsearch(0) = 0
 	//	[1, 3, 5].bsearch(1) = 0
 	//	[1, 3, 5].bsearch(4) = 2
 	//	[1, 3, 5].bsearch(5) = 2
 	//	[1, 3, 5].bsearch(6) = 3
 	//	[1, 2, 2, 2, 3].bsearch(2) = 1
-    size_t bsearch(const T &val) const
+    size_t bsearch(const T &val, bool reversed=false) const
 	{
-        if (this->len == 0)
+		const T *L = this->L;
+		const size_t len = this->len;
+
+        if (len == 0)
             return 0;
         size_t lo = 0;
-        size_t hi = this->len-1;
+        size_t hi = len-1;
         while (lo < hi) {
 			// |_ (lo+hi)/2 _| may cause int overflow, furthermore,
 			// if lo and hi are iterators, lo + hi is not possible
             size_t mid = lo + ((hi-lo) >> 1);
-			if (val == this->L[mid]) {
-				// replace following line with 'return mid;' if
-				// there's no need to return first index of val
-				hi = mid;
-			} else if (val < this->L[mid]) {
+			if (val == L[mid]) {
+				// uncomment following line if there's no need to 
+				// return first index of val
+				//return mid;
+				if (reversed)
+					lo = mid;
+				else
+					hi = mid;
+			} else if (val < L[mid]) {
 				// following 2 lines are needed if using unsigned index
 				if (mid == 0)
 					break;
@@ -241,16 +252,15 @@ class SortedArray: public Array<T> {
                 lo = mid+1;
 			}
 		}
-		if (val <= this->L[lo])
+		if (val <= L[lo])
 			return lo;
 		return lo+1;
 	}
 
 	// return the first index of val in L
-	// return -1 if not found
-	size_t find(const T &val) const
+	size_t find(const T &val, bool reversed=false) const
 	{
-		size_t i = bsearch(val);
+		size_t i = bsearch(val, reversed);
 		if (i < this->len && this->L[i] == val)
 			return i;
 		return this->notfound;
@@ -260,14 +270,17 @@ class SortedArray: public Array<T> {
 	// i != j and L[i] + L[j] == val
     bool two_sum(const T &val) const
 	{
-		if (this->len == 0)
+		const T *L = this->L;
+		const size_t len = this->len;
+
+		if (len == 0)
 			return false;
         size_t i = 0;
-        size_t j = this->len-1;
+        size_t j = len-1;
         while (i < j) {
-            if (this->L[i] + this->L[j] < val)
+            if (L[i] + L[j] < val)
                 ++i;
-			else if (this->L[i] + this->L[j] > val)
+			else if (L[i] + L[j] > val)
                 --j;
             else
                 return true; // i, j
@@ -310,12 +323,15 @@ class SortedSet: public SortedArray<T> {
 	//! lacks efficiency
 	SortedSet(const T *arr, size_t n): SortedArray<T>(arr, n)
 	{
-		if (this->len > 0) {
+		T *L = this->L;
+		size_t &len = this->len;
+
+		if (len > 0) {
 			size_t i = 0, j = 0;
-			while (++j != this->len)
-				if (this->L[i] != this->L[j])
-					this->L[++i] = this->L[j];
-			this->len = ++i;
+			while (++j != len)
+				if (L[i] != L[j])
+					L[++i] = L[j];
+			len = ++i;
 		}
 	}
 
@@ -323,21 +339,24 @@ class SortedSet: public SortedArray<T> {
 	SortedSet(const SortedSet &lhs, const SortedSet &rhs):
 		SortedArray<T>(lhs.capacity+rhs.capacity)
 	{
+		T *L = this->L;
+		size_t &len = this->len;
+
 		size_t i = 0, j = 0;
 		while (i < lhs.len && j < rhs.len) {
 			if (lhs.L[i] == rhs.L[j]) {
-				this->L[this->len++] = lhs.L[i++];
+				L[len++] = lhs.L[i++];
 				++j; // skip duplicate
 			} else if (lhs.L[i] < rhs.L[j]) {
-				this->L[this->len++] = lhs.L[i++];
+				L[len++] = lhs.L[i++];
 			} else {
-				this->L[this->len++] = rhs.L[j++];
+				L[len++] = rhs.L[j++];
 			}
 		}
 		while (i < lhs.len)
-			this->L[this->len++] = lhs.L[i++];
+			L[len++] = lhs.L[i++];
 		while (j < rhs.len)
-			this->L[this->len++] = rhs.L[j++];
+			L[len++] = rhs.L[j++];
 	}
 
 	// insert val while L remains ordered
@@ -356,4 +375,4 @@ class SortedSet: public SortedArray<T> {
 	}
 };
 
-#endif // ARRAY_H
+#endif // Array_h
