@@ -268,14 +268,39 @@ class DualList:
 			p = p->next;
 		return buffer + ']'
 
-# forward list implemented by array
+# static list -- forward list implemented by array
 #
 #   val  [ /, A, C, B, E, D]
 #   next [ 1, 3, 2, 5, 4, 0]
 #
 # represents:
 #   A -> B -> C -> D -> E -> NULL
+# method malloc and free have to implement by hand
 
-class ForwardListArr:
+class StaticListSpace:
 	val[]
 	next[]
+	NULL = 0
+
+	# link all nodes into a usable space table
+	# 0 indicates the dummy head node, as well as NULL pointer
+	# next[0] is the first node
+	construct(n):
+		val = new array[n]
+		next = new array[n]
+		for i = 0 to n-2:
+			next[i] = i+1
+		next[n-1] = NULL
+
+	malloc():
+		p = next[0]
+		if (p)
+			next[0] = next[p]
+		return p
+
+	free(p):
+		next[p] = next[0]
+		next[0] = p
+
+class StaticList:
+	...

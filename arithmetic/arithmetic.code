@@ -78,3 +78,8 @@ root(base, n, eps=1e-8):
     if ret < eps:
 		return 0
     return ret
+
+scanfb(x):
+printfb(x):
+mod2mul(x, y):
+mod2div(x, y):
