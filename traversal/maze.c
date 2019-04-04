@@ -11,6 +11,7 @@ char map[ROWS][COLS];
 char cpy[ROWS][COLS];
 int rows = 10;
 int cols = 10;
+int rstart, cstart, rgoal, cgoal;
 
 void maze_scan(const char *filename)
 {
@@ -29,6 +30,13 @@ void maze_scan(const char *filename)
 			map[rows][j++] = c;
 			if (j > cols)
 				cols = j;
+			if (c == 'S') {
+				rstart = rows;
+				cstart = j-1;
+			} else if (c == 'G') {
+				rgoal = rows;
+				cgoal = j-1;
+			}
 		}
 	}
 	fclose(fin);
@@ -162,10 +170,10 @@ void maze_solve(const char *method,
 
 int main()
 {
-	maze_scan("in");
+	maze_scan("maze.in");
 	puts("dfs:");
-	maze_solve("dfs", 1, 1, "v>^<");
+	maze_solve("dfs", rstart, cstart, "v>^<");
 	puts("bfs:");
-	maze_solve("bfs", 8, 8, "v>^<");
+	maze_solve("bfs", rgoal, cgoal, "v>^<");
 	return 0;
 }
