@@ -33,6 +33,18 @@ int isqrt(int x):
 	while ret != last
 	return ret
 
+# return sqrt(x*x + y*y), avoiding overflow
+hypot(x, y):
+	x, y = abs(x), abs(y)
+	if x > y:
+		r = y/x
+		return x*sqrt(1+r*r)
+	elif y == 0:
+		return 0
+	else:
+		r = x/y
+		return y*sqrt(1+r*r)
+
 # quick power
 # if base is int and exp >= 0, it can take another argument modulus
 # pow(0, 0) == 1
