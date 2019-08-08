@@ -1,0 +1,50 @@
+# 7 operators
+ADD = 0
+SUB = 1
+MUL = 2
+DIV = 3
+LPAREN = 4
+RPAREN = 5
+END = 6
+
+precede(op1, op2):
+	# = means the match between () and ends
+	# N means syntax error
+	static data[7][7] = [
+		> > < < < > >
+		> > < < < > >
+		> > > > < > >
+		> > > > < > >
+		< < < < < = N
+		> > > > N > >
+		< < < < < N =
+	]
+	return data[op1][op2]
+
+eval(tokens):
+	# stack operators
+	# stack operands
+	operators.push(END)
+	t = tokens.next()
+	while True:
+		if t.is_operand():
+			operands.push(t)
+			t = tokens.next()
+		else: # t is operator
+			switch precede(operators.top(), t):
+				case '<': # the precedence of the top elem is lower than t
+					operators.push(t)
+					t = tokens.next()
+					break
+				case '=': # eliminate both parenthesis, or reach the end
+					operators.pop()
+					if operators.empty():
+						return operands.top()
+					t = tokens.next()
+					break
+				case '>': # execute the arithmetic
+					op = operators.pop()
+					b = operands.pop()
+					a = operands.pop()
+					operands.push(op(a, b))
+					break

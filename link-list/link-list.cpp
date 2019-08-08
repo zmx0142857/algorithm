@@ -175,17 +175,18 @@ public:
 
 	void erase_after(CirListNode *p)
 	{
-		if (!p)
+		if (!p) return;
+		if (empty()) return;
+		if (sigular()) {
+			delete head;
+			head = NULL;
 			return;
+		}
 		CirListNode *tmp = p->next;
 		p->next = tmp->next;
+		if (tmp == head)
+			head = p->next;
 		delete tmp;
-		if (tmp == head) {
-			if (singular())
-				head = NULL;
-			else
-				head = p->next;
-		}
 	}
 
 	friend ostream &operator<<(ostream &os, const CirList &rhs)

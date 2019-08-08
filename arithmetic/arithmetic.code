@@ -20,6 +20,14 @@ get_digit(n, i, base=10):
 	n = abs(n)
 	return n // pow(base, n) % base
 
+# print integer in octal form (radix 8)
+oct_print(n):
+	while n:
+		stack.push(n % 8)
+		n //= 8
+	while stack:
+		print(stack.pop())
+
 # sqrare root for integers
 # returns floor(sqrt(x)) if x >= 0
 # returns -1 if x < 0

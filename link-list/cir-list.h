@@ -151,13 +151,15 @@ void CirList<T>::erase_after(CirListNode<T> *p)
 		return;
 	CirListNode<T> *temp = p->next;
 	p->next = temp->next;
-	delete temp;
 	if (temp == head) {
-		if (singular())
+		if (singular()) {
+			delete head;
 			head = NULL;
-		else
+			return;
+		} else
 			head = p->next;
 	}
+	delete temp;
 }
 
 template <class T>

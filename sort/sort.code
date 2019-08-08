@@ -21,7 +21,7 @@ selection_sort(L):
 
 bubble_sort(L):
 	for i = 1 to L.length-1:
-		for j = 0 to L.length-i:
+		for j = 0 to L.length-i-1:
 			if (L[j] > L[j+1])
 				swap(L, j, j+1)
 

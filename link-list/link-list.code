@@ -165,14 +165,17 @@ class CirList:
 	erase_after(p):
 		if !p:
 			return
+		if empty():
+			return
+		if sigular():
+			delete head
+			head = NULL
+			return
 		tmp = p->next
 		p->next = tmp->next						# 1. move pointer
-		delete tmp								# 2. delete
 		if tmp == head:
-			if singular():
-				head = NULL
-			else:
-				head = p->next
+			head = p->next
+		delete tmp								# 2. delete
 
 	to_str():
 		buffer = '['
