@@ -3,6 +3,7 @@
 #include <climits>	// UINT_MAX
 #include <vector>
 #include <algorithm>
+#include <queue>
 using namespace std;
 
 typedef unsigned Id;
@@ -26,9 +27,9 @@ struct PrimEdge {
 };
 
 // prim 算法, 适合稠密图
-void prim(Graph g, Id start)
+void naive_prim(const Graph &g, Id start)
 {
-	cout << "prim:\n";
+	cout << "naive prim:\n";
 
 	// 初始化边数组
 	PrimEdge to[N];
@@ -72,6 +73,41 @@ void prim(Graph g, Id start)
 	cout << endl;
 }
 
+// 用优先队列优化的 prim 算法
+void prim(const Graph &g, Id start)
+{
+	cout << "prim:\n";
+
+	PrimEdge to[N];
+	for (Id i = 0; i < N; ++i) {
+		to[i].from = start;
+		to[i].cost = INF;
+	}
+	to[start].from = start;
+	to[start].cost = 0;
+
+	typedef pair<Cost, Id> P;
+	priority_queue< P, vector<P>, greater<P> > q;
+	q.push(P(to[start].cost, start));
+	while (!q.empty()) {
+		P p = q.top(); q.pop();
+		Id i = p.second;
+		if (to[i].cost < p.first)
+			continue;
+		if (to[i].from != i)
+			add_edge(to[i].from, i, to[i].cost);
+		to[i].cost = 0;
+		for (Id j = 0; j < N; ++j) {
+			if (g[i][j] < to[j].cost) {
+				to[j].from = i;
+				to[j].cost = g[i][j];
+				q.push(P(to[j].cost, j));
+			}
+		}
+	}
+	cout << endl;
+}
+
 // Kruskal 算法的边结构
 struct KruskalEdge {
 	Id from, to;
@@ -83,7 +119,7 @@ struct KruskalEdge {
 };
 
 // naive 的 Kruskal 算法, 使用 array 确定结点所在的连通分量
-void naive_kruskal(Graph g)
+void naive_kruskal(const Graph &g)
 {
 	cout << "naive kruskal\n";
 	Id cnt = 0;
@@ -157,7 +193,7 @@ void merge(Id a, Id b)
 }
 
 // Kruskal 算法, 适合稀疏图
-void kruskal(Graph g)
+void kruskal(const Graph &g)
 {
 	cout << "kruskal\n";
 	Id cnt = 0;
@@ -210,7 +246,8 @@ int main()
 		{INF, INF, 4, 2, 6, 0}
 	};
 
-	prim(g, 0); // 从顶点 0 开始
+	naive_prim(g, 0); // 从顶点 0 开始
+	prim(g, 0);
 	naive_kruskal(g);
 	kruskal(g);
 
@@ -226,9 +263,70 @@ int main()
 		{2, 6, 1, 8, 3, 0}
 	};
 
+	naive_prim(g1, 0); // 从顶点 0 开始
 	prim(g1, 0);
 	naive_kruskal(g1);
 	kruskal(g1);
 
 	return 0;
 }
+
+/*
+# 1
+naive prim:
+AC = 1
+CF = 4
+FD = 2
+CB = 5
+BE = 3
+
+prim:
+AC = 1
+CF = 4
+FD = 2
+CB = 5
+BE = 3
+
+naive kruskal
+AC = 1
+DF = 2
+BE = 3
+CF = 4
+BC = 5
+
+kruskal
+AC = 1
+DF = 2
+BE = 3
+CF = 4
+BC = 5
+
+# 2
+naive prim:
+AF = 2
+FC = 1
+CE = 1
+EB = 2
+CD = 6
+
+prim:
+AF = 2
+FC = 1
+CE = 1
+EB = 2
+CD = 6
+
+naive kruskal
+CE = 1
+CF = 1
+AF = 2
+BE = 2
+BD = 6
+
+kruskal
+CE = 1
+CF = 1
+AF = 2
+BE = 2
+BD = 6
+*/
