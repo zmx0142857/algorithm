@@ -15,9 +15,20 @@ def rev(i, n):
     return ret
 
 # 设 n 是 2 的幂
-# 计算多项式 f(x) = sum_(0 <= k < n) a_k x^k 在 n 次单位根
-# ω_n^j = e^(2jπi/n) 处的值 f_j = sum_(0 <= k < n) a_k ω_n^(jk)
-# fft([4, 3, 2, 1]) = [10, 2+2j, 2, 2-2j]
+# 简记多项式 f(x) = sum_(0 <= k < n) a_k x^k 为 [a_0, ..., a_(n-1)].
+# fft 返回 f 在 n 次单位根 ω_n^j = e^(2jπi/n) 处的值
+# f_j = sum_(0 <= k < n) a_k ω_n^(jk)
+# 如 fft([4, 3, 2, 1]) = [10, 2+2j, 2, 2-2j]
+# 现假设 f 的次数是 2n-1, 定义多项式
+# g = [a_0, a_2, a_4, ..., a_(2n-2)]
+# h = [a_1, a_3, a_5, ..., a_(2n-1)]
+# 则 f(x) = g(x^2) + x h(x^2), 特别
+# f(ω_2n^j) = g(ω_2n^2j) + ω_2n^j h(ω_2n^2j)
+#           = g(ω_n^j) + ω_2n^j h(ω_n^j)
+# f(ω_2n^(n+j)) = g(ω_2n^(2n+2j)) + ω_2n^(n+j) h(ω_2n^(2n+2j))
+#               = g(ω_2n^2j) - ω_2n^j h(ω_2n^2j)
+#               = g(ω_n^j) - ω_2n^j h(ω_n^j)
+# 从而将 fft(f) 转化为两个规模为原问题一半的问题 fft(g) 与 fft(h)
 def fft(a, reverse=False):
     PI = -pi if reverse else pi
     n = len(a)
