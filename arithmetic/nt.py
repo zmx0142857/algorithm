@@ -28,18 +28,22 @@ positive = arg_checker(1)
 # 设 a, b 为非负整数, 返回最大公约数
 @unsigned
 def gcd(a, b):
-    if b == 0:
-        return a
-    return gcd(b, a % b)
+    def _gcd(a, b):
+        if b == 0:
+            return a
+        return _gcd(b, a % b)
+    return _gcd(a, b)
 
 # 推广的辗转相除法
 # 设 a, b 为非负整数, 返回最大公约数 d, 以及满足 d = a x + b y 的系数 x, y
 @unsigned
 def gcd_ext(a, b):
-    if b == 0:
-        return a, 1, 0
-    d, x, y = gcd_ext(b, a % b)
-    return d, y, x - (a//b)*y
+    def _gcd_ext(a, b):
+        if b == 0:
+            return a, 1, 0
+        d, x, y = _gcd_ext(b, a % b)
+        return d, y, x - (a//b)*y
+    return _gcd_ext(a, b)
 
 # 设 n 为非负整数, 返回平方不超过 n 的最大正整数
 @unsigned
