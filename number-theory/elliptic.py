@@ -15,4 +15,6 @@ print([
     for p in primes
 ])
 
-# 2. expand x * prod_(k >= 0) (1-x^(4k))(1-x^(8k))
+# 2. expand x * prod_(k >= 0) (1-x^(4k))(1-x^(8k))^2
+# x - 2x^5 - 3x^9 + 6x^13 + 2x^17
+print([0, 0, -2, 0, 0, 6, 2, 0, 0])

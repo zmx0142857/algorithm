@@ -3,6 +3,7 @@
 """ number theory tools """
 
 import functools
+from fractions import Fraction
 
 def arg_checker(code):
     def decorator(fn):
@@ -55,6 +56,18 @@ def sqrt(n):
             break
     # assert (x+1)**2 > n
     return x
+
+# 判断平方数
+# @integer
+def issquare(n):
+    if isinstance(n, Fraction):
+        return issquare(n.denominator) and issquare(n.numerator)
+    if n < 0:
+        return False
+    if n % 32 not in {0, 1, 4, 9, 16, 25, 17}: # 49 = 32 + 17
+        return False
+    r = sqrt(n)
+    return r*r == n
 
 """素性检测"""
 
@@ -195,7 +208,18 @@ def factor2(n, *, factors=None):
             print('sorry, ' + res)
     return factors
 
-factor = factor2
+factor_dict = {}
+# cached
+def factor(n, *, factors=None):
+    if factors == None:
+        factors = {}
+    if n in factor_dict:
+        for p in factor_dict[n]:
+            factors[p] = factors.get(p, 0) + factor_dict[n][p]
+        return factors
+    ret = factor2(n, factors=factors)
+    factor_dict[n] = ret.copy()
+    return ret
 
 # 设 n 是正整数, 返回 n 的所有因子, 次序从小到大
 # @positive
