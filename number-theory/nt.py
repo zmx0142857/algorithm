@@ -1,6 +1,35 @@
 #!/usr/bin/env python3
 
-""" number theory tools """
+""" number theory tools
+>>> gcd(24, 64)
+8
+>>> gcd(0, 0)
+0
+>>> gcd(0, 2)
+2
+>>> gcd_ext(15, 24)
+(3, -3, 2)
+>>> sqrt(0)
+0
+>>> sqrt(101)
+10
+>>> issquare(0)
+True
+>>> issquare(15)
+False
+>>> list(filter(isprime1, range(100)))
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+>>> factor1(25)
+{5: 2}
+>>> factor1(6)
+{2: 1, 3: 1}
+>>> factor1(1001)
+{7: 1, 11: 1, 13: 1}
+>>> factor1(2021)
+{43: 1, 47: 1}
+>>> factor1(2147483647)
+{2147483647: 1}
+"""
 
 import functools
 from fractions import Fraction
@@ -81,7 +110,7 @@ def isprime1(n):
     if (n % 6) % 4 != 1:
         return False
     # 用 6k+-1 试除
-    return all(n % (k-1) != 0 and n % (k+1) != 0 for k in range(6, sqrt(n), 6))
+    return all(n % k != 0 and n % (k+2) != 0 for k in range(5, sqrt(n)+1, 6))
 
 # Lucas-Lehmer 判定法
 # 判断梅森数 2^p-1 是否为素数的高效算法
@@ -145,6 +174,16 @@ def primes(n, sieve=None):
 
 """因子分解"""
 
+# 寻找 n 的一个素因子
+# n = 1 时返回 1
+def prime_of(n):
+    if n % 2 == 0:
+        return 2
+    for p in range(3, sqrt(n)+1, 2):
+        if n % p == 0:
+            return p
+    return n
+
 # 标准分解
 # 设 n 是正整数, 返回 n 的所有素因子及其次数
 # factor(252) -> {2:2, 3:2, 7:1}
@@ -152,8 +191,7 @@ def primes(n, sieve=None):
 def factor1(n, *, factors=None):
     if factors == None:
         factors = {}
-    p = 2
-    while p <= n:
+    for p in range(2, n+1):
         while n % p == 0:
             factors[p] = factors.get(p, 0) + 1
             n //= p
@@ -161,7 +199,6 @@ def factor1(n, *, factors=None):
         if isprime(n):
             factors[n] = factors.get(n, 0) + 1
             break
-        p += 1
     return factors
 
 """
@@ -208,16 +245,11 @@ def factor2(n, *, factors=None):
             print('sorry, ' + res)
     return factors
 
-factor_dict = {}
-# cached
-def factor(n, *, factors=None):
-    if factors == None:
-        factors = {}
+factor_dict = {} # cached
+def factor(n):
     if n in factor_dict:
-        for p in factor_dict[n]:
-            factors[p] = factors.get(p, 0) + factor_dict[n][p]
-        return factors
-    ret = factor2(n, factors=factors)
+        return factor_dict[n]
+    ret = factor2(n)
     factor_dict[n] = ret.copy()
     return ret
 
@@ -272,3 +304,7 @@ def mul_func(f, n):
 def phi(n):
     f = lambda p, a: p**(a-1)*(p-1)
     return mul_func(f, n)
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
