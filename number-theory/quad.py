@@ -63,7 +63,9 @@ class Quad(object):
     def __init__(self, *args):
         if len(args) == 1 and isinstance(args[0], dict):
             self.dict = args[0]
-        self.simplify()
+            self.simplify()
+        else:
+            raise TypeError('accept dict only')
 
     def __str__(self):
         buf = []
@@ -88,8 +90,7 @@ class Quad(object):
     # cancel out squares
     def simplify(self):
         buf = {}
-        for n in self.dict:
-            coef = self.dict[n]
+        for n,coef in self.dict.items():
             if coef == 0:
                 continue
             f = nt.factor(n) # long time!
@@ -100,7 +101,8 @@ class Quad(object):
                 if f[p] % 2:
                     m *= p
             dic_add(buf, m, coef)
-        self.dict = buf
+        self.dict = {}
+        self.dict.update(filter(lambda t: t[1] != 0, buf.items()))
 
     def __eq__(self, other):
         if not isinstance(other, Quad):
@@ -164,7 +166,9 @@ class Quad(object):
         buf = {}
         for m in self.dict:
             for n in other.dict:
-                dic_add(buf, m*n, self.dict[m] * other.dict[n])
+                coef = self.dict[m] * other.dict[n]
+                if coef != 0:
+                    dic_add(buf, m*n, coef)
         return Quad(buf)
 
     def __truediv__(self, other):
