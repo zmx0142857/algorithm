@@ -29,6 +29,14 @@ False
 {43: 1, 47: 1}
 >>> factor1(2147483647)
 {2147483647: 1}
+>>> div(15, 11, 16)
+13
+>>> div(8, 12, 16)
+[2, 6, 10, 14]
+>>> [phi(n) for n in range(1,20)]
+[1, 1, 2, 2, 4, 2, 6, 4, 6, 4, 10, 4, 12, 6, 8, 8, 16, 6, 18]
+>>> [isroot(i, 7) for i in range(2, 7)]
+[False, True, False, True, False]
 """
 
 import functools
@@ -74,6 +82,22 @@ def gcd_ext(a, b):
         d, x, y = _gcd_ext(b, a % b)
         return d, y, x - (a//b)*y
     return _gcd_ext(a, b)
+
+# 解 a x = b (mod n)
+def div(b, a, n):
+    d, x, y = gcd_ext(a, n)
+    if d == 1:
+        return b * x % n
+    a //= d
+    b //= d
+    n //= d
+    d1, x, y = gcd_ext(a, n)
+    ret = []
+    r = b * x % n
+    for i in range(d):
+        ret.append(r)
+        r += n
+    return ret
 
 # 设 n 为非负整数, 返回平方不超过 n 的最大正整数
 # @unsigned
@@ -304,6 +328,16 @@ def mul_func(f, n):
 def phi(n):
     f = lambda p, a: p**(a-1)*(p-1)
     return mul_func(f, n)
+
+# 判断 r 是否为模 n 的原根
+def isroot(r, n):
+    phin = phi(n)
+    e = r
+    for i in range(1, phin//2+1):
+        if e == 1:
+            return False
+        e = e * r % n
+    return True
 
 if __name__ == '__main__':
     import doctest

@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """Provides operations on quadratic numbers x_1 + x_2 √2 + ... + x_n √n"""
 
-__author__ = 'Clarence Zhuo'
+__author__ = 'zmx0142857'
 
 from fractions import Fraction # 支持 Quad 和有理数的混合运算
 import nt, math
+
+MSG_UNSIGNED = 'expecting non-negative int'
 
 def dic_add(dic, key, value):
     dic[key] = dic.get(key, 0) + value
 
 def sqrt(n):
     if not isinstance(n, int):
-        raise TypeError('expecting non-negative int')
+        raise TypeError(MSG_UNSIGNED)
     if n < 0:
-        raise ValueError('expecting non-negative int')
+        raise ValueError(MSG_UNSIGNED)
     return Quad({n:1})
 
 class Quad(object):
@@ -57,6 +60,10 @@ class Quad(object):
     >>> b.inv()
     1+√2+√3+√5+√7
     >>> a * b
+    1
+    >>> (sqrt(2)+1)**2
+    3+2√2
+    >>> (sqrt(2)+1)**0
     1
     """
     #s.replace(/([+-])?(\d+)\/(\d+)√?(\d+)?/g, ',$4:$1Fraction($2,$3)')
@@ -120,7 +127,7 @@ class Quad(object):
         return True
 
     def __ne__(self, other):
-        return False
+        return not self == other
 
     def __float__(self):
         return sum(math.sqrt(n) * self.dict[n] for n in self.dict)
@@ -222,6 +229,16 @@ class Quad(object):
         #print(self * conj, '^-1 *', factor * conj)
         #input('<press enter>')
         return (self * conj).inv(factor * conj)
+
+    # TODO: too naive
+    def __pow__(self, n):
+        if not isinstance(n, int) and n >= 0:
+            raise TypeError(MSG_UNSIGNED)
+        ret = 1
+        while n > 0:
+            ret *= self
+            n -= 1
+        return ret
 
 if __name__ == '__main__':
     import doctest
