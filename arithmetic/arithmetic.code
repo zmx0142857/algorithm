@@ -6,11 +6,8 @@ abs(x):
 
 # returns the number of digits of an int
 count_digit(n, base=10):
-	if n == 0:
-		return 1
-	cnt = 0
-	while num:
-		num //= base
+	cnt = 1
+	while n //= base:
 		++cnt
 	return cnt
 

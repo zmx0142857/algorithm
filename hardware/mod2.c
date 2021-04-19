@@ -55,6 +55,16 @@ size_t scanfb(unsigned *p)
 
 // input 0xb 0x5
 // return 0x27
+//
+//   0101
+// x 1011
+// ------
+//    101
+//   101
+//  000
+// 101
+// ------
+// 100111
 unsigned mod2mul(unsigned x, unsigned y)
 {
 	unsigned ret = 0;
