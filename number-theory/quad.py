@@ -65,6 +65,17 @@ class Quad(object):
     3+2√2
     >>> (sqrt(2)+1)**0
     1
+    >>> -sqrt(2)
+    -√2
+    >>> sqrt(2)/2
+    1/2√2
+    >>> f = lambda n: [((2+sqrt(2))*(3-2*sqrt(2))**n + (2-sqrt(2))*(3+2*sqrt(2))**n)/2, -((1+sqrt(2))*(3-2*sqrt(2))**n + (1-sqrt(2))*(3+2*sqrt(2))**n)/2]
+    >>> f(1)
+    [2, 1]
+    >>> f(2)
+    [10, 7]
+    >>> f(3)
+    [58, 41]
     """
     #s.replace(/([+-])?(\d+)\/(\d+)√?(\d+)?/g, ',$4:$1Fraction($2,$3)')
     def __init__(self, *args):
@@ -141,6 +152,7 @@ class Quad(object):
     def __neg__(self):
         for n in self.dict:
             self.dict[n] = -self.dict[n]
+        return self
 
     def __add__(self, other):
         if not isinstance(other, Quad):
@@ -187,10 +199,9 @@ class Quad(object):
             elif other == 0:
                 raise ZeroDivisionError
             try:
-                return self / Fraction(other)
-            except Exception:
+                return self / Quad({1: Fraction(other)})
+            except Exception as e:
                 return NotImplemented
-            return NotImplemented
         return self * other.inv()
 
     def __radd__(rhs, lhs):
