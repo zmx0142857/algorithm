@@ -203,9 +203,13 @@ def primes(n, sieve=None):
 def prime_of(n):
     if n % 2 == 0:
         return 2
-    for p in range(3, sqrt(n)+1, 2):
+    if n % 3 == 0:
+        return 3
+    for p in range(5, sqrt(n)+1, 6):
         if n % p == 0:
             return p
+        if n % (p+2) == 0:
+            return p+2
     return n
 
 # 标准分解
@@ -247,7 +251,7 @@ def pollard_rho(n):
         if 1 < g and g < n:
             return g
         x = f(x)
-    return 'not found, maybe prime'
+    return prime_of(n) # fallback
 
 # 试试看！
 # 2**67-1 = 193707721 * 761838257287
@@ -325,12 +329,24 @@ def mul_func(f, n):
     return prod(f(p, a) for p, a in factors.items())
 
 # 求 Euler 函数的值
+# @positive
 def phi(n):
     f = lambda p, a: p**(a-1)*(p-1)
     return mul_func(f, n)
 
+# r 模 n 的阶
+# @positive
+def order(r, n):
+    phin = phi(n)
+    for d in all_factors1(phin):
+        if pow(r, d, n) == 1:
+            return d
+
 # 判断 r 是否为模 n 的原根
+# @positive
 def isroot(r, n):
+    return order(r, n) == phi(n)
+    """
     phin = phi(n)
     e = r
     for i in range(1, phin//2+1):
@@ -338,6 +354,17 @@ def isroot(r, n):
             return False
         e = e * r % n
     return True
+    """
+
+# continued fraction
+def frac(x):
+    while True:
+        n = int(x)
+        yield n
+        x = 1 / (x - n)
+
+def frac_val(L):
+    return L[0] if len(L) == 1 else L[0] + 1 / frac_val(L[1:])
 
 if __name__ == '__main__':
     import doctest
