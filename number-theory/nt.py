@@ -127,14 +127,7 @@ def issquare(n):
 # 设 n 是整数, 用试除法判断 n 是否为素数
 # @integer
 def isprime1(n):
-    # 2, 3 是素数
-    if n <= 3:
-        return n >= 2
-    # 其余素数为 6k+-1 的形式
-    if (n % 6) % 4 != 1:
-        return False
-    # 用 6k+-1 试除
-    return all(n % k != 0 and n % (k+2) != 0 for k in range(5, sqrt(n)+1, 6))
+    return n > 1 and prime_of(n) == n
 
 # Lucas-Lehmer 判定法
 # 判断梅森数 2^p-1 是否为素数的高效算法
@@ -198,13 +191,15 @@ def primes(n, sieve=None):
 
 """因子分解"""
 
-# 寻找 n 的一个素因子
+# 用试除法寻找 n 的最小素因子
 # n = 1 时返回 1
 def prime_of(n):
+    # 用 2, 3 试除
     if n % 2 == 0:
         return 2
     if n % 3 == 0:
         return 3
+    # 用 6n+-1 试除
     for p in range(5, sqrt(n)+1, 6):
         if n % p == 0:
             return p
