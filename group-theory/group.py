@@ -8,7 +8,7 @@ Cycle {1: 2, 2: 3, 3: 1}
 [(1, 2, 3)]
 >>> p = Perm({ 1: 2, 2: 3, 3: 1, 4: 5, 5: 4 })
 >>> p.factor()
-[(1, 2, 3), (4, 5)]
+'(1 2 3) (4 5)'
 >>> p
 Perm {1: 2, 2: 3, 3: 1, 4: 5, 5: 4}
 >>> p.inv()
@@ -17,6 +17,16 @@ Perm {2: 1, 3: 2, 1: 3, 5: 4, 4: 5}
 6
 >>> c.conj(p)
 Perm {1: 2, 2: 3, 3: 1}
+>>> Perm({ 'a': 'b', 'b': 'c', 'c': 'a', 'd': 'e', 'e': 'd' }).factor()
+'(a b c) (d e)'
+>>> c**(-2)
+Perm {1: 2, 2: 3, 3: 1}
+>>> (c**3).factor()
+'()'
+>>> Cycle(1, 2) * Cycle(3, 4) * Cycle(1, 3) * Cycle(2, 4) != Cycle(1, 3) * Cycle(2, 4) * Cycle(1, 2) * Cycle(3, 4)
+False
+>>> Cycle()
+Cycle {}
 """
 
 import math
@@ -39,7 +49,15 @@ class Perm:
     def factor(self):
         if not self.cycles:
             self.cycles = _factor(self.perm.copy())
-        return self.cycles
+        return str(self.cycles)\
+            .replace("'", '')\
+            .replace('[]', '()')\
+            .replace('[', '')\
+            .replace(']', '')\
+            .replace(',', '')
+
+    def __eq__(self, other):
+        return self.perm == other.perm
 
     def __mul__(self, other):
         keys = set(self.perm.keys()).union(set(other.perm.keys()))
@@ -53,9 +71,28 @@ class Perm:
         ret = dict((v, k) for (k, v) in self.perm.items())
         return Perm(ret)
 
+    # 快速幂
+    def __pow__(self, n):
+        a = self
+        if n < 0:
+            a = self.inv()
+            n = -n
+        ret = Perm({}) # 单位元
+        mask = 1 << n.bit_length()-1
+        while mask:
+            ret *= ret
+            if n & mask:
+                ret *= a
+            mask >>= 1
+        return ret
+
     # 共轭
     def conj(self, other):
         return other * self * other.inv()
+
+    # 换位子
+    def commutor(self, other):
+        return self * other * self.inv() * other.inv()
 
     # 各个轮换的阶的最小公倍数
     def ord(self):
@@ -65,14 +102,15 @@ class Perm:
 
 # 轮换
 class Cycle(Perm):
-    def __init__(self, *arr: int):
+    def __init__(self, *arr):
         self.cycles = [tuple(arr)]
         self.perm = {}
-        k = arr[0]
-        for v in arr[1:]:
-            self.perm[k] = v
-            k = v
-        self.perm[arr[-1]] = arr[0]
+        if len(arr):
+            k = arr[0]
+            for v in arr[1:]:
+                self.perm[k] = v
+                k = v
+            self.perm[arr[-1]] = arr[0]
 
 # 分解为不相交轮换
 def _factor(perm: dict):

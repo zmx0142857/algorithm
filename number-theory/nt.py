@@ -37,6 +37,12 @@ False
 [1, 1, 2, 2, 4, 2, 6, 4, 6, 4, 10, 4, 12, 6, 8, 8, 16, 6, 18]
 >>> [isroot(i, 7) for i in range(2, 7)]
 [False, True, False, True, False]
+>>> import math
+>>> g = frac(math.sqrt(5))
+>>> [next(g) for n in range(10)]
+[2, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+>>> to_squares(114514)
+(191, 265, 88, 8)
 """
 
 import functools
@@ -121,6 +127,47 @@ def issquare(n):
         return False
     r = sqrt(n)
     return r*r == n
+
+# 把素数 p = 4k+1 写为两个数的平方和
+def prime_4kp1_to_squares(p):
+    i = 1
+    j = sqrt(p)
+    while i < j:
+        s = i**2 + j**2
+        if s < p:
+            i += 1
+        elif s > p:
+            j -= 1
+        else:
+            return i, j
+    raise ValueError('expect p = %s = 4k+1 to be a prime' % p)
+
+# 把素数 p 写为四平方和
+def prime_to_squares(p):
+    if p % 4 == 1:
+        return *prime_4kp1_to_squares(p), 0, 0
+    elif p == 2:
+        return 1, 1, 0, 0
+    elif p == 3:
+        return 1, 1, 1, 0
+    else:
+        return *prime_4kp1_to_squares(p-2), 1, 1
+
+# 把正整数 n 写为四平方和
+# TODO: 当 n 中 4k+1 型素数的次数均为偶数时, n 可以写为两个整数的平方和
+def to_squares(n):
+    a = (1, 0, 0, 0)
+    factored = factor(n)
+    for p in factored:
+        b = prime_to_squares(p)
+        for i in range(factored[p]):
+            a = (
+                a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3],
+                a[0]*b[1] - a[1]*b[0] + a[2]*b[3] - a[3]*b[2],
+                a[0]*b[2] - a[1]*b[3] - a[2]*b[0] + a[3]*b[1],
+                a[0]*b[3] + a[1]*b[2] - a[2]*b[1] - a[3]*b[0]
+            )
+    return tuple(map(abs, a))
 
 """素性检测"""
 
